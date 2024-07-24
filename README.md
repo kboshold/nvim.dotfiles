@@ -7,8 +7,8 @@
    <p>
       <a href="https://github.com/kpalatzky/nvim.dotfiles/blob/master/LICENSE">
         <img src="https://img.shields.io/github/license/kpalatzky/nvim.dotfiles.svg" alt="MIT License"/>
-       <a href="https://github.com/neovim/neovim#is-also-awesome">
-      </a> 
+      </a>
+      <a href="https://github.com/neovim/neovim#is-also-awesome">
          <img alt="Neovim" src="https://img.shields.io/badge/%3E%3D0.9.2-5e9a3d?logo=neovim&label=neovim&labelColor=1375b2"/>
        </a>
    </p>
