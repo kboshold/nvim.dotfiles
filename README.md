@@ -11,6 +11,8 @@
    </p>
    <hr>
    <p>
-      <span style="font-size:24px;">💤 Want to be a lazy ninja? 💤</span>
+      <span style="font-size:26px;">💤 Want to be a lazy ninja? 💤</span>
+      <br>
+      <span style="font-size:20px;"><i>My personal NeoVim configuration. <i></span>
    </p>
 </div>
