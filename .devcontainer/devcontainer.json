@@ -1,8 +1,15 @@
 {
     "name": "Workspace",
-    "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
-    "features": {},
-    "postCreateCommand": "cd ./util/executor/ && npm install",
+    "image": "mcr.microsoft.com/devcontainers/universal:linux",
+    "features": {
+      "ghcr.io/devcontainers/features/rust:1": {
+        "version": "latest"
+      },
+      "ghcr.io/devcontainers/features/lua:1": {
+        "version": "latest"
+      }
+    },
+    "postCreateCommand": "cargo install stylua",
     "customizations": {
         // Configure properties specific to VS Code.
         "vscode": {
@@ -13,7 +20,10 @@
             "sumneko.lua",
             "yzhang.markdown-all-in-one",
             "takumii.markdowntable"
-          ]
+          ],
+          "settings": {
+            "workbench.iconTheme": "material-icon-theme"
+          }
         }
       }
   }
