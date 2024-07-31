@@ -5,7 +5,7 @@
       "ghcr.io/devcontainers/features/rust:1": {
         "version": "latest"
       },
-      "ghcr.io/devcontainers/features/lua:1": {
+      "ghcr.io/veronoicc/devcontainer-features/luajit-2.1.0-beta3:1": {
         "version": "latest"
       }
     },
