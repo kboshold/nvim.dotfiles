@@ -1,0 +1,19 @@
+{
+    "name": "Workspace",
+    "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+    "features": {},
+    "postCreateCommand": "cd ./util/executor/ && npm install",
+    "customizations": {
+        // Configure properties specific to VS Code.
+        "vscode": {
+          // Add the IDs of extensions you want installed when the container is created.
+          "extensions": [
+            "pkief.material-icon-theme",
+            "tamasfe.even-better-toml",
+            "sumneko.lua",
+            "yzhang.markdown-all-in-one",
+            "takumii.markdowntable"
+          ]
+        }
+      }
+  }
