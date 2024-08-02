@@ -14,6 +14,7 @@
    </p>
    <hr>
    <p>
+      <h3>⚠️🚧 This project is not yet working at all. Please do not use it 🚧⚠️<h3>
       <h3>💤 Want to be a lazy neo ninja? 💤</h3>
       <div>My personal Neovim configuration.</div>
    </p>
