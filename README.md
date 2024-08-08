@@ -33,8 +33,8 @@
 | ripgrep    | >= 14.1.0 | <img src="https://img.shields.io/badge/suggested-392361?style=flat" alt="Suggested"/> | [Installation](https://github.com/BurntSushi/ripgrep?tab=readme-ov-file#installation)                     |
 | fd         | >= 10.1.0 | <img src="https://img.shields.io/badge/suggested-392361?style=flat" alt="Suggested"/> | [Installation](https://github.com/sharkdp/fd?tab=readme-ov-file#installation)                             |
 | lazygit    | >= 0.43.1 | <img src="https://img.shields.io/badge/optional-31435e?style=flat" alt="Optional"/>   | [Installation](https://github.com/jesseduffield/lazygit?tab=readme-ov-file#installation)                  |
-| lazydocker | >= 0.23.3 | <img src="https://img.shields.io/badge/optional-31435e?style=flat" alt="Optional"/>   | [Installation](https://github.com/jesseduffield/lazydocker#installation)                                  |
-| lazynpm    | >= 0.1.4  | <img src="https://img.shields.io/badge/optional-31435e?style=flat" alt="Optional"/>   | [Installation](https://github.com/jesseduffield/lazynpm#installation)                                     |
+<!-- | lazydocker | >= 0.23.3 | <img src="https://img.shields.io/badge/optional-31435e?style=flat" alt="Optional"/>   | [Installation](https://github.com/jesseduffield/lazydocker#installation)                                  |
+| lazynpm    | >= 0.1.4  | <img src="https://img.shields.io/badge/optional-31435e?style=flat" alt="Optional"/>   | [Installation](https://github.com/jesseduffield/lazynpm#installation)                                     | -->
 
 
 
@@ -55,7 +55,7 @@ mv ~/.cache/nvim{,.bak}
 Clone this repository:
 
 ```sh
-git clone https://github.com/kpalatzky/nvim.dotfiles ~/.config/nvim
+git clone https://github.com/kboshold/nvim.dotfiles ~/.config/nvim
 ```
 
 Start Neovim:
