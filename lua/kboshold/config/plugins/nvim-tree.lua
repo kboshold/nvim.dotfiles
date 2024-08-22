@@ -23,7 +23,6 @@ local function open_nvim_tree(data)
     return
   end
 
-
   require("nvim-tree.api").tree.open({ focus = false, find_file = true, })
 end
 
