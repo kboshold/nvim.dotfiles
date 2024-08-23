@@ -2,7 +2,6 @@
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
-
 -- TODO: Refactor later
 vim.api.nvim_create_autocmd("BufEnter", {
   nested = true,
