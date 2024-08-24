@@ -59,9 +59,23 @@ git clone https://github.com/kboshold/nvim.dotfiles ~/.config/nvim
 ```
 
 Start Neovim:
-```
+```sh
 nvim
 ```
+
+#### 🦄 Uni-Line Installation
+
+> [!WARNING]  
+> This does a little more than the script above. It also checks the necessary dependencies and tries to install them.
+> You will of course be asked before the installation. 
+
+```sh
+curl https://github.com/kboshold/nvim.dotfiles/install.sh | bash
+```
+
+#### 🧙‍♂️ Using my dotfiles
+
+They are included, so dont do anything 🤷‍♂️ 
 
 ### ⚙️ Configuration
 
@@ -70,6 +84,9 @@ nvim
 ## Usage
 
 ### Keymaps
+
+> [!IMPORTANT]  
+> Highlights information that users should take into account, even when skimming.
 
 <!-- generated-keymaps-start --!>
 
