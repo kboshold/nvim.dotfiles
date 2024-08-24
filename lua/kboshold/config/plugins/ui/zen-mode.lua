@@ -1,8 +1,9 @@
 return {
   "folke/zen-mode.nvim",
   config = function()
-    
-      -- Key.Desc: Enables the zen-mode with a width of 120 and with numbers.
+
+      -- TODO: Keymap
+      -- Keymap.Desc: Enables the zen-mode with a width of 120 and with numbers.
       vim.keymap.set("n", "<leader>zz", function()
           require("zen-mode").setup {
               window = {
@@ -17,7 +18,8 @@ return {
           ColorMyPencils()
       end)
 
-      -- Key.Desc: Enables the zen-mode with a width of 100 and without numbers.
+      -- TODO: Keymap
+      -- Keymap.Desc: Enables the zen-mode with a width of 100 and without numbers.
       vim.keymap.set("n", "<leader>zZ", function()
           require("zen-mode").setup {
               window = {
@@ -31,6 +33,6 @@ return {
           vim.wo.rnu = false
           vim.opt.colorcolumn = "0"
           ColorMyPencils()
-      end, { desc = "" })
+      end)
   end
 }
