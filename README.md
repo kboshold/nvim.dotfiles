@@ -15,7 +15,7 @@
    <hr>
    <p>
       <h3>⚠️🚧 This project is not yet working at all. Please do not use it 🚧⚠️<h3>
-      <h3>💤 Want to be a lazy neo ninja? 💤</h3>
+      <h3>💤 Want to be a lazy neo ninja? 🥷💤</h3>
       <div>My personal Neovim configuration.</div>
    </p>
 </div>
@@ -75,7 +75,7 @@ curl https://github.com/kboshold/nvim.dotfiles/install.sh | bash
 
 #### 🧙‍♂️ Using my dotfiles
 
-They are included, so dont do anything 🤷‍♂️ 
+The [kboshold/dotfiles](https://github.com/kboshold/dotfiles) also include the latest version of this Neovim configuration. So if you want to use them, you do not have to do anything at all! 🤯
 
 ### ⚙️ Configuration
 
