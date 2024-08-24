@@ -20,9 +20,9 @@
    </p>
 </div>
 
-## Get started
+## ✨ Get started
 
-### ⚡️Requirements
+### ⚡️ Requirements
 
 | Tool       | Version   | Usage                                                                                 | Note                                                                                                      |
 | ---------- | --------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
@@ -81,12 +81,16 @@ They are included, so dont do anything 🤷‍♂️
 
 
 
-## Usage
+## 🫅 Usage
 
-### Keymaps
+### ⌨️ Keymaps
+
+> [!TIP]  
+> You can of course also view the keymaps directly in Neovim with `:nmap`, `:vmap` as usual (Typing `:help map` in Neovim will give you more info.)
+
 
 > [!IMPORTANT]  
-> Highlights information that users should take into account, even when skimming.
+> The following keymaps are automatically extracted from the code via a pipeline and inserted here. Therefore, make sure that you have the latest version. 
 
 <!-- generated-keymaps-start --!>
 
