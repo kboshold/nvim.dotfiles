@@ -1,3 +1,9 @@
+#!/bin/bash
+
+#####
+# TODO add check for installed software and may install it. 
+#####
+
 # required
 mv ~/.config/nvim{,.bak}
 

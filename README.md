@@ -66,8 +66,10 @@ nvim
 #### 🦄 Uni-Line Installation
 
 > [!WARNING]  
-> This does a little more than the script above. It also checks the necessary dependencies and tries to install them.
+> This does a little more than the script above*. It also checks the necessary dependencies and tries to install them.
 > You will of course be asked before the installation. 
+> 
+> *I will implement it in the future!
 
 ```sh
 curl https://github.com/kboshold/nvim.dotfiles/install.sh | bash
