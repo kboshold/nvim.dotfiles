@@ -1,3 +1,5 @@
+-- if true then return {} end
+
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
@@ -15,17 +17,22 @@ return {
   init = function()
 
     -- automatically open for no arguments (current directory) and when a directory will be opend
-    local function open_nvim_tree(data)
+    local function on_buf_enter(data)
       local is_directory = vim.fn.isdirectory(data.file) == 1
       local no_name = data.file == "" and vim.bo[data.buf].buftype == ""
+      local is_stream = vim.g.ux_piped_input == 1
+      
+      if is_stream then
+        return
+      end
 
       if not (is_directory or no_name) then
         return
       end
 
-      require("neo-tree.command").execute({ toggle = true })
+       require("neo-tree.command").execute({ action = "show" })
     end
-    vim.api.nvim_create_autocmd({ "VimEnter" }, { callback = open_nvim_tree })
+    vim.api.nvim_create_autocmd({ "BufEnter" }, { callback = on_buf_enter })
 
   end,
   opts = {
@@ -82,5 +89,6 @@ return {
       }
     },
   },
+
   
 }

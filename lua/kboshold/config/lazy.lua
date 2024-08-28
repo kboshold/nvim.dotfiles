@@ -4,7 +4,7 @@ require("lazy").setup({
     -- { import = "kboshold.config.plugins.debug" },
     -- { import = "kboshold.config.plugins.lsp" },
     { import = "kboshold.config.plugins.ui" },
-    -- { import = "kboshold.config.plugins.util" }
+    { import = "kboshold.config.plugins.util" }
   },
   defaults = {
     lazy = false,
@@ -20,9 +20,9 @@ require("lazy").setup({
       -- disable some rtp plugins
       disabled_plugins = {
         "gzip",
-        -- "matchit",
-        -- "matchparen",
-        -- "netrwPlugin",
+        "matchit",
+        "matchparen",
+        "netrwPlugin",
         "tarPlugin",
         "tohtml",
         "tutor",
