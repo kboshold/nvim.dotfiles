@@ -49,7 +49,7 @@ return {
         with_expanders = true
       },
       modified = {
-        symbol = "M"
+        symbol = ""
       },
       git_status = {
         symbols = {
