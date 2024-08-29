@@ -17,7 +17,13 @@ return {
   init = function()
 
     -- automatically open for no arguments (current directory) and when a directory will be opend
+    local first_buf_enter = 1;
     local function on_buf_enter(data)
+      if first_buf_enter == 0 then
+        return
+      end
+      first_buf_enter = 0;
+
       local is_directory = vim.fn.isdirectory(data.file) == 1
       local no_name = data.file == "" and vim.bo[data.buf].buftype == ""
       local is_stream = vim.g.ux_piped_input == 1
