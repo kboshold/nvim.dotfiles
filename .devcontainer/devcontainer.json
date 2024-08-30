@@ -22,7 +22,8 @@
             "takumii.markdowntable"
           ],
           "settings": {
-            "workbench.iconTheme": "material-icon-theme"
+            "workbench.iconTheme": "material-icon-theme",
+            "editor.fontFamily": "'JetBrainsMonoNL Nerd Font Mono','JetBrainsMono Nerd Font Mono', Consolas, 'Courier New', monospace"
           }
         }
       }

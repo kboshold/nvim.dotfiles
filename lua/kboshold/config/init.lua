@@ -13,4 +13,4 @@ require('kboshold.config.autocmd')
 require('kboshold.config.lazy')
 require('kboshold.config.keymaps')
 
-vim.cmd [[colorscheme tokyonight]]
+vim.cmd [[colorscheme catppuccin]]

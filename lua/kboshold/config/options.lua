@@ -43,5 +43,6 @@ assign(vim.opt, {
   smoothscroll = true,
   foldexpr = "v:lua.require'lazyvim.util'.ui.foldexpr()",
   foldmethod = "expr",
-  foldtext = ""
+  foldtext = "",
+  -- colorcolumn = '100,120'
 })

@@ -3,6 +3,7 @@ require("lazy").setup({
     -- We could do this dynamic using vim.fn.readdir but why should we waste time?
     -- { import = "kboshold.config.plugins.debug" },
     -- { import = "kboshold.config.plugins.lsp" },
+    { import = "kboshold.config.plugins.color" },
     { import = "kboshold.config.plugins.ui" },
     { import = "kboshold.config.plugins.util" }
   },
