@@ -1,5 +1,33 @@
 -- if true then return {} end
 
+local colors = {
+  red = '#ca1243',
+  grey = '#a0a1a7',
+  black = '#383a42',
+  white = '#f3f3f3',
+  light_green = '#83a598',
+  orange = '#fe8019',
+  green = '#8ec07c',
+}
+
+
+local function process_sections(sections)
+  for name, section in pairs(sections) do
+    local left = name:sub(9, 10) < 'x'
+    for pos = 1, name ~= 'lualine_z' and #section or #section - 1 do
+      table.insert(section, pos * 2, { empty, color = { fg = colors.white, bg = colors.white } })
+    end
+    for id, comp in ipairs(section) do
+      if type(comp) ~= 'table' then
+        comp = { comp }
+        section[id] = comp
+      end
+      comp.separator = left and { right = '' } or { left = '' }
+    end
+  end
+  return sections
+end
+
 return {
   'nvim-lualine/lualine.nvim',
   event = "VeryLazy",
@@ -23,20 +51,22 @@ return {
         globalstatus = true,
         component_separators = '',
         section_separators = { left = '', right = '' },
+        section_separators = { left = '', right = '' }, -- Do i want this... 
       },
-      sections = {
+      sections = process_sections  {
+        
         lualine_a = { 
-          function()
-            -- May add recording section
-            local reg = vim.fn.reg_recording()
-            if reg == "" then 
-              return ""
-            end
-            return "󰑋  @" .. reg
-          end,
           "mode"
         },
         lualine_b = { 
+            function()
+              -- May add recording section
+              local reg = vim.fn.reg_recording()
+              if reg == "" then 
+                return ""
+              end
+              return "󰑋  @" .. reg
+            end,
           "branch",
           "diff",
           "diagnostics"
