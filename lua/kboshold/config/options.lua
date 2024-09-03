@@ -36,6 +36,7 @@ assign(vim.opt, {
     diff = "╱",
     eob = " ",
   },
+  mouse = "",
   scrolloff = 4,                               -- Scroll 4 lines
   tabstop = 2,                                 -- Insert 2 spaces
   wrap = false,                                 -- Disable line wrap

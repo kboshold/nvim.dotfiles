@@ -11,23 +11,6 @@ local colors = {
 }
 
 
-local function process_sections(sections)
-  for name, section in pairs(sections) do
-    local left = name:sub(9, 10) < 'x'
-    for pos = 1, name ~= 'lualine_z' and #section or #section - 1 do
-      table.insert(section, pos * 2, { empty, color = { fg = colors.white, bg = colors.white } })
-    end
-    for id, comp in ipairs(section) do
-      if type(comp) ~= 'table' then
-        comp = { comp }
-        section[id] = comp
-      end
-      comp.separator = left and { right = '' } or { left = '' }
-    end
-  end
-  return sections
-end
-
 return {
   'nvim-lualine/lualine.nvim',
   event = "VeryLazy",
@@ -43,22 +26,47 @@ return {
       -- hide the statusline on the starter page
       vim.o.laststatus = 0
     end
+
   end,
   opts = function()
+    local empty = require('lualine.component'):extend()
+    function empty:draw(default_highlight)
+      self.status = ''
+      self.applied_separator = ''
+      self:apply_highlights(default_highlight)
+      self:apply_section_separators()
+      return self.status
+    end
+
     return {
       options = {
         theme = "auto",
         globalstatus = true,
-        component_separators = '',
-        section_separators = { left = '', right = '' },
-        section_separators = { left = '', right = '' }, -- Do i want this... 
+        section_separators = { left = '', right = '' },
       },
-      sections = process_sections  {
-        
+      sections = {
         lualine_a = { 
           "mode"
         },
         lualine_b = { 
+          { 
+            empty,
+            separator = { right = '' },
+            color = { fg = colors.red, bg = "#181825" }
+          },
+          {
+            function() 
+              return "<A>"
+            end,
+            separator = { right = '' },
+            color = { fg = "#ffffff", bg = "#202020" }
+          },
+          { 
+            empty,
+            separator = { right = '' },
+            color = { fg = colors.red, bg = "#181825" }
+          },
+          {
             function()
               -- May add recording section
               local reg = vim.fn.reg_recording()
@@ -67,9 +75,53 @@ return {
               end
               return "󰑋  @" .. reg
             end,
-          "branch",
-          "diff",
-          "diagnostics"
+            separator = { right = '' },
+            color = { fg = colors.white, bg = colors.red } 
+          },
+          { 
+            empty,
+            separator = { right = '' },
+            color = { fg = colors.red, bg = "#181825" }
+          },
+          {
+            function() 
+              return "<C>"
+            end,
+            separator = { right = '' },
+            color = { fg = "#ffffff", bg = "#606060" }
+          }
+
+
+          -- { empty, color = { fg = colors.red, bg = colors.white } },
+          -- {
+          --   function()
+          --     -- May add recording section
+          --     local reg = vim.fn.reg_recording()
+          --     if reg == "" then 
+          --       return ""
+          --     end
+          --     return "󰑋  @" .. reg
+          --   end,
+          --   color = { fg = colors.blue, bg = colors.red } 
+          -- },
+          -- { empty, color = { fg = colors.green, bg = colors.blue } },
+          -- {
+          --   function()
+          --     return "󰑋  @q"
+          --   end,
+          --   separator =  { right = '' },
+          --   padding = { ht = 2 },
+          --   color = { fg = colors.black, bg = colors.white } 
+          -- },
+          -- {
+          --   "filename",
+          --   separator = { left = 'X' },
+          --   padding = { left = 2, right = 2 }
+
+          -- },
+          -- "branch",
+          -- "diff",
+          -- "diagnostics"
         },
         lualine_c = {
           "filename"
