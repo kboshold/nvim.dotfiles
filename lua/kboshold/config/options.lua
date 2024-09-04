@@ -39,11 +39,11 @@ assign(vim.opt, {
   mouse = "",
   scrolloff = 4,                               -- Scroll 4 lines
   tabstop = 2,                                 -- Insert 2 spaces
-  wrap = false,                                 -- Disable line wrap
+  wrap = false,                                -- Disable line wrap
 
   smoothscroll = true,
   foldexpr = "v:lua.require'lazyvim.util'.ui.foldexpr()",
   foldmethod = "expr",
   foldtext = "",
-  -- colorcolumn = '100,120'
+  colorcolumn = '101,121'                      -- Line should be smaller equal 100 chars and must be smaller equal 120 chars
 })
