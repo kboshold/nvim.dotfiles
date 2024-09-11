@@ -1,16 +1,5 @@
 -- if true then return {} end
 
-local colors = {
-  red = '#ca1243',
-  grey = '#a0a1a7',
-  black = '#383a42',
-  white = '#f3f3f3',
-  light_green = '#83a598',
-  orange = '#fe8019',
-  green = '#8ec07c',
-}
-
-
 return {
   'nvim-lualine/lualine.nvim',
   event = "VeryLazy",
@@ -38,10 +27,19 @@ return {
       return self.status
     end
 
+    local mocha = require("catppuccin.palettes").get_palette "mocha"
+
+    local emptyEntry =  { 
+      empty,
+      separator = { right = '' },
+      color = { bg = mocha.mantle }
+    }
+
     return {
       options = {
         theme = "auto",
         globalstatus = true,
+        component_separators = { left = '', right = '' },
         section_separators = { left = '', right = '' },
       },
       sections = {
@@ -49,23 +47,7 @@ return {
           "mode"
         },
         lualine_b = { 
-          { 
-            empty,
-            separator = { right = '' },
-            color = { fg = colors.red, bg = "#181825" }
-          },
-          {
-            function() 
-              return "<A>"
-            end,
-            separator = { right = '' },
-            color = { fg = "#ffffff", bg = "#202020" }
-          },
-          { 
-            empty,
-            separator = { right = '' },
-            color = { fg = colors.red, bg = "#181825" }
-          },
+          emptyEntry,
           {
             function()
               -- May add recording section
@@ -76,60 +58,43 @@ return {
               return "󰑋  @" .. reg
             end,
             separator = { right = '' },
-            color = { fg = colors.white, bg = colors.red } 
+            color = { fg = mocha.base, bg =  mocha.red } 
           },
-          { 
-            empty,
-            separator = { right = '' },
-            color = { fg = colors.red, bg = "#181825" }
-          },
+          emptyEntry,
           {
-            function() 
-              return "<C>"
-            end,
+            "branch",
             separator = { right = '' },
-            color = { fg = "#ffffff", bg = "#606060" }
-          }
-
-
-          -- { empty, color = { fg = colors.red, bg = colors.white } },
-          -- {
-          --   function()
-          --     -- May add recording section
-          --     local reg = vim.fn.reg_recording()
-          --     if reg == "" then 
-          --       return ""
-          --     end
-          --     return "󰑋  @" .. reg
-          --   end,
-          --   color = { fg = colors.blue, bg = colors.red } 
-          -- },
-          -- { empty, color = { fg = colors.green, bg = colors.blue } },
-          -- {
-          --   function()
-          --     return "󰑋  @q"
-          --   end,
-          --   separator =  { right = '' },
-          --   padding = { ht = 2 },
-          --   color = { fg = colors.black, bg = colors.white } 
-          -- },
-          -- {
-          --   "filename",
-          --   separator = { left = 'X' },
-          --   padding = { left = 2, right = 2 }
-
-          -- },
-          -- "branch",
-          -- "diff",
-          -- "diagnostics"
+          },      
+          {
+            "diff",
+            separator = { right = '' },
+          },  
+          emptyEntry,
+          {
+            "diagnostics",
+            separator = { right = '' },
+          },  
         },
         lualine_c = {
-          "filename"
+          {
+            "filename",
+            path = 1,
+            color = { fg = mocha.overlay1 } 
+          }
         },
         lualine_x = {
-          "encoding",
-          "fileformat",
-          "filetype"
+          {
+            "encoding",
+            color = { fg = mocha.overlay1 } 
+          },
+          {
+            "fileformat",
+            color = { fg = mocha.overlay1 } 
+          },
+          {
+            "filetype",
+            color = { fg = mocha.overlay1 } 
+          },
         },
         lualine_y = {
           'searchcount',
