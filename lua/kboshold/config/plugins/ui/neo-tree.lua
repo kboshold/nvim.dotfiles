@@ -49,6 +49,11 @@ return {
       bind_to_cwd = false,
       follow_current_file = { enabled = true },
       use_libuv_file_watcher = true,
+      filtered_items = {
+        visible  = true,
+        hide_dotfiles = false,
+        never_show = { "node_modules", ".git" },
+      }
     },
     default_component_configs = {
       indent = {
@@ -86,15 +91,5 @@ return {
     window = {
       width = 36
     },
-    filesystem = {
-      use_libuv_file_watcher = true,
-      filtered_items = {
-        visible  = true,
-        hide_dotfiles = false,
-        never_show = { "node_modules", ".git" },
-      }
-    },
   },
-
-  
 }
