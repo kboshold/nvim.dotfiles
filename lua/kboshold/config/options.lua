@@ -40,7 +40,11 @@ assign(vim.opt, {
   scrolloff = 4,                               -- Scroll 4 lines
   tabstop = 2,                                 -- Insert 2 spaces
   wrap = false,                                -- Disable line wrap
-
+  listchars = {
+    space = '·',
+    tab = ' '
+  },
+  list = true,
   smoothscroll = true,
   foldexpr = "v:lua.require'lazyvim.util'.ui.foldexpr()",
   foldmethod = "expr",

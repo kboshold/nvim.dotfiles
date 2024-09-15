@@ -66,5 +66,6 @@ vim.api.nvim_create_autocmd("ColorScheme", {
     -- Set the new color to ColorColumn
     vim.api.nvim_set_hl(0, "ColorColumn", { bg = new_color })
     vim.api.nvim_set_hl(0, "CursorLine", { bg = new_color })
+
   end
 })
