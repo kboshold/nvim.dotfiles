@@ -13,8 +13,8 @@ require("lazy").setup({
   },
   install = {},
   checker = {
-    enabled = true, -- check for plugin updates periodically
-    notify = true, -- notify on update
+    enabled = false, -- check for plugin updates periodically
+    notify = false, -- notify on update
   }, -- automatically check for plugin updates
   performance = {
     rtp = {

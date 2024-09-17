@@ -22,6 +22,10 @@ return {
       },
     });
 
+    vim.keymap.set('n', '<leader>oo', function() 
+
+    end, {});
+
     -- keymap
     local open_preview = false
     vim.keymap.set('n', '<leader>od', function()
