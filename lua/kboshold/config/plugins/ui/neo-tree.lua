@@ -16,6 +16,11 @@ return {
   end,
   init = function()
 
+    vim.diagnostic.severity["I"] = "INFO"
+    vim.diagnostic.severity["H"] = "HINT"
+    vim.diagnostic.severity["W"] = "WARN"
+    vim.diagnostic.severity["E"] = "ERROR"
+
     -- automatically open for no arguments (current directory) and when a directory will be opend
     local first_buf_enter = 1;
     local function on_buf_enter(data)
@@ -27,7 +32,7 @@ return {
       local is_directory = vim.fn.isdirectory(data.file) == 1
       local no_name = data.file == "" and vim.bo[data.buf].buftype == ""
       local is_stream = vim.g.ux_piped_input == 1
-      
+
       if is_stream then
         return
       end
@@ -36,13 +41,15 @@ return {
         return
       end
 
-       require("neo-tree.command").execute({ action = "show" })
+      require("neo-tree.command").execute({ action = "show" })
     end
     vim.api.nvim_create_autocmd({ "BufEnter" }, { callback = on_buf_enter })
 
   end,
   opts = {
     close_if_last_window = true,
+    enable_git_status = true,
+    enable_diagnostics = true,
     sources = { "filesystem", "buffers", "git_status" },
     open_files_do_not_replace_types = { "terminal", "Trouble", "trouble", "qf", "Outline" },
     filesystem = {
@@ -56,8 +63,9 @@ return {
       }
     },
     default_component_configs = {
+      container = { enable_character_fade = true },
       indent = {
-        with_expanders = true
+        with_expanders = true,
       },
       modified = {
         symbol = ""
@@ -73,6 +81,7 @@ return {
           unstaged  = "M",
           staged    = "M",
           conflict  = "C",
+
         },
       },
       file_size = {

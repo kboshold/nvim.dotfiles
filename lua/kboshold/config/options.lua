@@ -44,6 +44,7 @@ assign(vim.opt, {
     space = '·',
     tab = ' '
   },
+  signcolumn = "auto:2-5",
   list = true,
   smoothscroll = true,
   foldexpr = "v:lua.require'lazyvim.util'.ui.foldexpr()",
@@ -51,3 +52,8 @@ assign(vim.opt, {
   foldtext = "",
   colorcolumn = '101,121'                      -- Line should be smaller equal 100 chars and must be smaller equal 120 chars
 })
+
+-- vim.fn.sign_define("DiagnosticSignError", {text = "", texthl = "DiagnosticSignError"})
+-- vim.fn.sign_define("DiagnosticSignWarn", {text = "", texthl = "DiagnosticSignWarn"})
+-- vim.fn.sign_define("DiagnosticSignInfo", {text = "", texthl = "DiagnosticSignInfo"})
+-- vim.fn.sign_define("DiagnosticSignHint", {text = "󰌵", texthl = "DiagnosticSignHint"})

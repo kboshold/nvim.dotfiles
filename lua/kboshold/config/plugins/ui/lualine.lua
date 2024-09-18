@@ -64,7 +64,7 @@ return {
           {
             "branch",
             separator = { right = '' },
-          },      
+          },
           {
             "diff",
             separator = { right = '' },
