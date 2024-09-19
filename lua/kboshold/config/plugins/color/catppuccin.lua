@@ -5,7 +5,7 @@ return {
   opts = {
     flavour = "mocha",
     custom_highlights = {
-      Whitespace = { fg = "#27273b"}
+      Whitespace = { fg = "#27273b"},
     }
   },
 

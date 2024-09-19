@@ -9,6 +9,11 @@ return {
 
     local telescope = require('telescope')
     telescope.setup({
+      pickers = {
+        find_files = {
+          hidden = true
+        }
+      },
       defaults = {
         layout_config = {
           width = function(_, max_columns)

@@ -1,5 +1,3 @@
--- if true then return {} end
-
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
@@ -15,7 +13,6 @@ return {
     vim.cmd([[Neotree close]])
   end,
   init = function()
-
     vim.diagnostic.severity["I"] = vim.diagnostic.severity.INFO
     vim.diagnostic.severity["H"] = vim.diagnostic.severity.HINT
     vim.diagnostic.severity["W"] = vim.diagnostic.severity.WARN
@@ -62,6 +59,9 @@ return {
         never_show = { "node_modules", ".git" },
       }
     },
+    source_selector = {
+      padding = 2
+    },
     default_component_configs = {
       container = { enable_character_fade = true },
       indent = {
@@ -98,7 +98,9 @@ return {
       }
     },
     window = {
-      width = 36
+      position = "left",
+      width = 36,
+      padding = 4
     },
   },
 }

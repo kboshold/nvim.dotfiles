@@ -1,12 +1,12 @@
 -- Set ux_piped_input to `1` for input streams
-vim.api.nvim_create_autocmd("StdinReadPost", { 
+vim.api.nvim_create_autocmd("StdinReadPost", {
   callback = function()
     vim.g.ux_piped_input = 1;
-  end 
+  end
 })
 
 -- Change the color or the CursorLineNr depending on the mode
-function update_cursor_line_nr()
+local function update_cursor_line_nr()
   local suffix = require("lualine.highlight").get_mode_suffix()
 
   local cursor_line_hl = vim.api.nvim_get_hl(0, {
@@ -19,12 +19,11 @@ function update_cursor_line_nr()
     create = false
   })
 
-  vim.api.nvim_set_hl(0, "CursorLineNr", { 
+  vim.api.nvim_set_hl(0, "CursorLineNr", {
     fg = lualine_hl.bg,
     bg = cursor_line_hl.bg,
     bold = true
   })
-  
 end
 
 vim.api.nvim_create_autocmd("ModeChanged", {
@@ -40,7 +39,7 @@ vim.api.nvim_create_autocmd("ColorScheme", {
   callback = function()
       -- Get the current background color
     local bg_color = vim.api.nvim_get_hl(0, {
-      name = "Normal", 
+      name = "Normal",
       create = false
     }).bg
 
@@ -54,7 +53,7 @@ vim.api.nvim_create_autocmd("ColorScheme", {
 
     -- require("notify")("GOT COLOR " .. tostring(r) .. " " .. tostring(bg_color))
     -- if true then return end;
-    
+
     -- Lighten the color by 10%
     r = math.min(255, r + (255 - r) * 0.02)
     g = math.min(255, g + (255 - g) * 0.02)
