@@ -16,10 +16,10 @@ return {
   end,
   init = function()
 
-    vim.diagnostic.severity["I"] = "INFO"
-    vim.diagnostic.severity["H"] = "HINT"
-    vim.diagnostic.severity["W"] = "WARN"
-    vim.diagnostic.severity["E"] = "ERROR"
+    vim.diagnostic.severity["I"] = vim.diagnostic.severity.INFO
+    vim.diagnostic.severity["H"] = vim.diagnostic.severity.HINT
+    vim.diagnostic.severity["W"] = vim.diagnostic.severity.WARN
+    vim.diagnostic.severity["E"] = vim.diagnostic.severity.ERROR
 
     -- automatically open for no arguments (current directory) and when a directory will be opend
     local first_buf_enter = 1;

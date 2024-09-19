@@ -1,4 +1,5 @@
-return { "neovim/nvim-lspconfig",
+return {
+  "neovim/nvim-lspconfig",
   dependencies = {
     "mason.nvim",
     "williamboman/mason-lspconfig.nvim"
@@ -6,18 +7,18 @@ return { "neovim/nvim-lspconfig",
   config = function() 
     local lspconfig = require("lspconfig");
 
+    kasdfjklsdf kasdfj kldfsaj klasdfj klasdfjasdfkl asdfklasdf 
+      asdkjsdfklajklsdfajkldfsajklfasdjkldfjaskljklasdf dfsa
+      asdfkjasdfkljsdfa ksdflj klsdafjklasdjf klasdfjk lsdajf klasdjf klasdfj sdkalfj klsdafj sda
+
     vim.diagnostic.config({
       underline = true,
       update_in_insert = true,
       severity_sort = true,
       virtual_text = {
         prefix = '▎',
-        spacing = 0,
-        virt_text_win_col = 120,
-        virt_text_pos = "right_align",
-        -- format = function(diagnostic)
-        --   return diagnostic.message:gsub("[\n\t]+", " "):gsub("^%s+", ""):gsub("%s+", " ")
-        -- end,
+        spacing = 4,
+        source = "if_many"
       },
       signs = {
         --support diagnostic severity / diagnostic type name
