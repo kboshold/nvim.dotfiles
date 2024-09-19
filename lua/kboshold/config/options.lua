@@ -38,11 +38,17 @@ assign(vim.opt, {
   },
   mouse = "",
   scrolloff = 4,                               -- Scroll 4 lines
-  tabstop = 2,                                 -- Insert 2 spaces
+
+  tabstop = 3,                                 -- Insert 2 spaces
+  shiftwidth = 3,
+  softtabstop = 3,
+  expandtab = false,
+  smarttab = true,
+
   wrap = false,                                -- Disable line wrap
   listchars = {
     space = '·',
-    tab = ' '
+    tab = ' '
   },
   signcolumn = "yes:2",
   list = true,
