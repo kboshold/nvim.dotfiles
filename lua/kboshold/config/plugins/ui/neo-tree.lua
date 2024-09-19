@@ -99,8 +99,7 @@ return {
     },
     window = {
       position = "left",
-      width = 36,
-      padding = 4
+      width = 38
     },
   },
 }
