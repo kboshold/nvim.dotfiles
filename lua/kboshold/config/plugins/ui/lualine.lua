@@ -107,19 +107,17 @@ return {
           {
             "filetype",
           },
+          right_seperator,
           {
             function()
-              return ""
-            end,
-            color = function()
               local bufnr = vim.api.nvim_get_current_buf()
               local clients = vim.lsp.get_clients({ bufnr = bufnr })
               if clients ~= nil and #clients > 0 then
-                return { fg = mocha.green }
-              else
-                return { fg = mocha.red }
+                return ""
               end
+              return ""
             end,
+            color = { fg = mocha.green },
             padding = { left = 0, right = 1 }
           },
           right_seperator,

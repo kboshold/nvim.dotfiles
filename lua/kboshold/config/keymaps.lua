@@ -2,6 +2,8 @@
 vim.keymap.set("n", " ", "<Nop>", { silent = true, remap = false })
 vim.g.mapleader = " "
 
+vim.keymap.set("", "<ScrollWheelUp>", "<C-B>")
+vim.keymap.set("", "<ScrollWheelDown>", "<C-F>")
 
 vim.keymap.set("n", "<leader>dd", function()
   local function dump(o)
@@ -16,13 +18,6 @@ vim.keymap.set("n", "<leader>dd", function()
       return tostring(o)
     end
   end
-
-
---  print(dump(vim.diagnostic.serverity))
-  -- print(dump(vim.diagnostic.config().signs))
-  local extmark = vim.api.nvim_buf_get_extmarks(0, 20, 0, -1, {type = 'sign', details=true})
-  print(dump(vim.fn.sign_getdefined()[1]))
-
 
 
 end, {});
