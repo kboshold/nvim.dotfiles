@@ -9,12 +9,76 @@ return {
   },
   opts = function()
     local cmp = require("cmp")
+    local cmp_style = "atom_colored"
+
+    vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
+
+    local function border(hl_name)
+      return {
+        { "╭", hl_name },
+        { "─", hl_name },
+        { "╮", hl_name },
+        { "│", hl_name },
+        { "╯", hl_name },
+        { "─", hl_name },
+        { "╰", hl_name },
+        { "│", hl_name },
+      }
+    end
 
     return {
-      sources = cmp.config.sources({
+      completion = {
+        completeopt = "menu,menuone,noinsert",
+      },
+
+      window = {
+        completion = {
+          border = border "CmpBorder",
+          side_padding = (cmp_style ~= "atom" and cmp_style ~= "atom_colored") and 1 or 0,
+          winhighlight = "Normal:CmpPmenu,CursorLine:CmpSel,Search:None",
+          scrollbar = false,
+        },
+        documentation = {
+          border = border "CmpDocBorder",
+          winhighlight = "Normal:CmpDoc",
+        }
+      },
+
+      sources = {
         { name = "nvim_lsp" },
+        { name = "luasnip" },
+        { name = "buffer" },
         { name = "path" },
-      }, {{ name = "buffer" }}),
+      },
+
+      formatting = {
+        format = function(entry, item)
+          local icons = require("kboshold.config.icons").kinds
+          if icons[item.kind] then
+            item.kind = " " .. icons[item.kind] .. " " .. item.kind
+          end
+
+          local widths = {
+            abbr = vim.g.cmp_widths and vim.g.cmp_widths.abbr or 40,
+            menu = vim.g.cmp_widths and vim.g.cmp_widths.menu or 30,
+          }
+
+          for key, width in pairs(widths) do
+            if item[key] and vim.fn.strdisplaywidth(item[key]) > width then
+              item[key] = vim.fn.strcharpart(item[key], 0, width - 1) .. "…"
+            end
+          end
+
+          return item
+        end,
+      },
+
+      experimental = {
+        ghost_text = {
+          hl_group = "CmpGhostText",
+        },
+      },
+
       mapping = cmp.mapping.preset.insert {
         ['<C-d>'] = cmp.mapping.scroll_docs(-4),
         ['<C-f>'] = cmp.mapping.scroll_docs(4),

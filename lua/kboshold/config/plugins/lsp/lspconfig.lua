@@ -1,6 +1,5 @@
 return {
   "neovim/nvim-lspconfig",
-  lazy = false,
   dependencies = {
     "mason.nvim",
     "williamboman/mason-lspconfig.nvim"
@@ -73,7 +72,8 @@ return {
       has_cmp and cmp_nvim_lsp.default_capabilities() or {}
     )
 
-    local servers = { 'clangd', 'rust_analyzer', 'pyright', 'ts_ls', 'angularls', 'ansiblels', 'bashls', 'cssls', 'yamlls' }
+    local servers = {'rust_analyzer', 'ts_ls', 'angularls', 'ansiblels', 'bashls', 'cssls', 'yamlls' }
+   -- local servers = {}
     for _, lsp in ipairs(servers) do
       lspconfig[lsp].setup {
         on_attach = on_attach,
