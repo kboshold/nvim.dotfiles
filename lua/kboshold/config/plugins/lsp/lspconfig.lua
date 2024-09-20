@@ -1,4 +1,6 @@
-return { "neovim/nvim-lspconfig",
+return {
+  "neovim/nvim-lspconfig",
+  lazy = false,
   dependencies = {
     "mason.nvim",
     "williamboman/mason-lspconfig.nvim"
@@ -47,9 +49,42 @@ return { "neovim/nvim-lspconfig",
       },
     });
 
+    local on_attach = function(_, bufnr)
+      local attach_opts = { silent = true, buffer = bufnr }
+      vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, attach_opts)
+      vim.keymap.set('n', 'gd', vim.lsp.buf.definition, attach_opts)
+      vim.keymap.set('n', 'K', vim.lsp.buf.hover, attach_opts)
+      vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, attach_opts)
+      vim.keymap.set('n', '<C-s>', vim.lsp.buf.signature_help, attach_opts)
+      vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, attach_opts)
+      vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, attach_opts)
+      vim.keymap.set('n', '<leader>wl', function() print(vim.inspect(vim.lsp.buf.list_workspace_folders())) end, attach_opts)
+      vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, attach_opts)
+      vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, attach_opts)
+      vim.keymap.set('n', 'so', require('telescope.builtin').lsp_references, attach_opts)
+    end
+
+    -- may enable cmp
+    local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+    local capabilities  = vim.tbl_deep_extend(
+      "force",
+      {},
+      vim.lsp.protocol.make_client_capabilities(),
+      has_cmp and cmp_nvim_lsp.default_capabilities() or {}
+    )
+
+    local servers = { 'clangd', 'rust_analyzer', 'pyright', 'ts_ls', 'angularls', 'ansiblels', 'bashls', 'cssls', 'yamlls' }
+    for _, lsp in ipairs(servers) do
+      lspconfig[lsp].setup {
+        on_attach = on_attach,
+        capabilities = capabilities,
+      }
+    end
 
     -- Setup lsp servers
     lspconfig.lua_ls.setup({
+      capabilities = capabilities,
+      on_attach = on_attach,
       on_init = function(client)
         if client.workspace_folders then
           local path = client.workspace_folders[1].name
@@ -79,8 +114,13 @@ return { "neovim/nvim-lspconfig",
         })
       end,
       settings = {
-        Lua = {}
+        Lua = {
+          completion = {
+            callSnippet = 'Replace',
+          },
+        }
       }
     })
+
   end
 }

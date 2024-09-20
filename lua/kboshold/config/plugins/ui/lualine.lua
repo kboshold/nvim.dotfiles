@@ -85,7 +85,11 @@ return {
           {
             "filename",
             path = 1,
-            color = { fg = mocha.overlay1 }
+            color = { fg = mocha.overlay1 },
+          },
+          {
+            "filesize",
+            color = { fg = mocha.surface1 },
           }
         },
         lualine_x = {
@@ -123,11 +127,21 @@ return {
           right_seperator,
         },
         lualine_z = {
-          'searchcount',
+          right_seperator,
+          {
+            'searchcount',
+            separator = { left = '' },
+            color = { bg = mocha.sky }
+          },
+          right_seperator,
+          {
+            "progress",
+            separator = { left = '' },
+          },
           {
             "location",
-            padding = { left = 1, right = 1 }
-          },
+            padding = { left = 0, right = 1 },
+          }
         }
       }
     }

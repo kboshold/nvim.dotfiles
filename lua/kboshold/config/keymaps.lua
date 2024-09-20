@@ -2,8 +2,11 @@
 vim.keymap.set("n", " ", "<Nop>", { silent = true, remap = false })
 vim.g.mapleader = " "
 
-vim.keymap.set("", "<ScrollWheelUp>", "<C-B>")
-vim.keymap.set("", "<ScrollWheelDown>", "<C-F>")
+vim.keymap.set("", "<ScrollWheelUp>", "<C-e>")
+vim.keymap.set("", "<ScrollWheelDown>", "<C-y>")
+
+vim.keymap.set("n", "<leader>j", "<C-e>")
+vim.keymap.set("n", "<leader>k", "<C-y>")
 
 vim.keymap.set("n", "<leader>dd", function()
   local function dump(o)
