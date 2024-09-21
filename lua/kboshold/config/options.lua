@@ -3,7 +3,6 @@ local function assign(dest, src)
       dest[k] = v
   end
 end
-
 -- map leader to <Space>
 vim.keymap.set("n", " ", "<Nop>", { silent = true, remap = false })
 

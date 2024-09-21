@@ -23,7 +23,7 @@ return {
     });
 
     vim.keymap.set('n', '<leader>oo', function() 
-
+      oil.open()
     end, {});
 
     -- keymap
@@ -43,8 +43,16 @@ return {
       pattern = "oil",
       callback = function()
         if vim.api.nvim_win_get_config(0).relative ~= "" then -- Check if the window is floating
-          vim.keymap.set('n', 'q', oil.toggle_float, { noremap = true, silent = true, buffer = true })
-          vim.keymap.set('n', '<ESC>', oil.toggle_float, { noremap = true, silent = true, buffer = true })
+          local opts = { noremap = true, silent = true, buffer = true }
+
+          vim.keymap.set('n', 'q', oil.toggle_float, opts)
+          vim.keymap.set('n', '<ESC>', oil.toggle_float, opts)
+
+          -- todo: fix issue with neotree
+          vim.keymap.set('n', '<CR>', function() 
+            oil.select({}, function(err)
+            end)
+          end, opts)
         end
       end,
     })

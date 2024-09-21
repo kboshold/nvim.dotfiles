@@ -9,9 +9,6 @@ return {
   },
   opts = function()
     local cmp = require("cmp")
-    local cmp_style = "atom_colored"
-
-    vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
 
     local function border(hl_name)
       return {
@@ -34,9 +31,8 @@ return {
       window = {
         completion = {
           border = border "CmpBorder",
-          side_padding = (cmp_style ~= "atom" and cmp_style ~= "atom_colored") and 1 or 0,
+          side_padding = 1,
           winhighlight = "Normal:CmpPmenu,CursorLine:CmpSel,Search:None",
-          scrollbar = false,
         },
         documentation = {
           border = border "CmpDocBorder",
@@ -71,12 +67,6 @@ return {
 
           return item
         end,
-      },
-
-      experimental = {
-        ghost_text = {
-          hl_group = "CmpGhostText",
-        },
       },
 
       mapping = cmp.mapping.preset.insert {
