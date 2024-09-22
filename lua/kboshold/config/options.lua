@@ -27,6 +27,7 @@ assign(vim.opt, {
   completeopt = "menu,menuone,noselect",
   confirm = true,                             -- Confirm to save before exit buffer
   cursorline = true,                          -- Highlight current line
+
   fillchars = {
     foldopen = "",
     foldclose = "",
@@ -35,15 +36,13 @@ assign(vim.opt, {
     diff = "╱",
     eob = " ",
   },
-  scrolloff = 15,                               -- Scroll 4 lines
-
-  tabstop = 3,                                 -- Insert 2 spaces
-  shiftwidth = 3,
-  softtabstop = 3,
-  expandtab = false,
-  smarttab = true,
-
-  wrap = false,                                -- Disable line wrap
+  scrolloff = 15,                              -- Minimal number of screen lines to keep above and below the cursor.
+  tabstop = 3,                                 -- Number of spaces that a <Tab> in the file counts for.
+  shiftwidth = 3,                              -- Number of spaces to use for each step of (auto)indent.
+  softtabstop = 3,                             -- Number of spaces that a <Tab> in the file counts for.
+  expandtab = false,                           -- Use a tab over spaces since the size can be individual.
+  smarttab = true,                             -- Smart indent and remove of tabs/spaces 
+  wrap = false,                                -- Long lines wrap to the next line when enabled
   listchars = {
     space = '·',
     tab = ' '
@@ -54,6 +53,19 @@ assign(vim.opt, {
   foldexpr = "v:lua.require'lazyvim.util'.ui.foldexpr()",
   foldmethod = "expr",
   foldtext = "",
-  colorcolumn = '101,121'                      -- Line should be smaller equal 100 chars and must be smaller equal 120 chars
+  colorcolumn = '101,121',                      -- screen columns that are highlighted with ColorColumn
+  grepprg = "rg --vimgrep",                     -- use rg oder grep
+  laststatus = 3,                               -- Expaned status over all buffers
+  linebreak = true,
+  showmode = false,
+  sidescrolloff = 8,
+
+  smartcase = true,
+  smartindent = true,
+  spelllang = { "en" },
+  undofile = true,
+  undolevels = 10000,
+  updatetime = 200,
+  virtualedit = "block",
 })
 
