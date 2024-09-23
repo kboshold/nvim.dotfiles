@@ -45,7 +45,9 @@ assign(vim.opt, {
   wrap = false,                                -- Long lines wrap to the next line when enabled
   listchars = {
     space = '·',
-    tab = ' '
+	-- tab = '│ ',
+	tab = "▏ ",
+--    tab = ' '
   },
   signcolumn = "yes:2",
   list = true,
