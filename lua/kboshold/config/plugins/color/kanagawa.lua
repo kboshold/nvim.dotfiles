@@ -1,8 +1,8 @@
 return {
-  "rebelot/kanagawa.nvim",
-  name = "kanagawa",
-  priority = 1000,
-  opts = {
-    theme = "wave"
-  }
+	"rebelot/kanagawa.nvim",
+	name = "kanagawa",
+	priority = 1000,
+	opts = {
+		theme = "wave"
+	}
 }
