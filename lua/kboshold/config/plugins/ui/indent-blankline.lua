@@ -1,4 +1,4 @@
-return   {
+return {
 	"lukas-reineke/indent-blankline.nvim",
 	main = "ibl",
 	event = "BufEnter",
@@ -25,6 +25,7 @@ return   {
 
 		require("ibl").setup {
 			scope = {
+				char = "▏",
 				highlight = scope_highlights,
 				enabled = true,
 				show_exact_scope = false,
@@ -32,8 +33,8 @@ return   {
 				show_end = false,
 			},
 			indent = {
+				char = "▏",
 				highlight = indent_highlights,
-				char = "▏"
 			},
 			whitespace = {
 				highlight = indent_highlights,

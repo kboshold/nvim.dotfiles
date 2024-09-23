@@ -41,6 +41,9 @@ return {
 
 				CmpPmenu = { bg = colors.base, fg = colors.text },
 				CmpSel = { bg = colors.blue, fg = colors.mantle, bold = true },
+
+				ColorColumnBlue = { fg = util.color.interpolate(colors.base, colors.blue, 0.98) },
+				ColorColumnRed = { fg = util.color.interpolate(colors.base, colors.red, 0.98) }
 			}
 
 			for _, accent in ipairs(accents) do
