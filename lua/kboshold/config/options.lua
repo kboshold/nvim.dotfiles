@@ -37,9 +37,9 @@ assign(vim.opt, {
 		eob = " ",
 	},
 	scrolloff = 15,                              -- Minimal number of screen lines to keep above and below the cursor.
-	tabstop = 3,                                 -- Number of spaces that a <Tab> in the file counts for.
-	shiftwidth = 3,                              -- Number of spaces to use for each step of (auto)indent.
-	softtabstop = 3,                             -- Number of spaces that a <Tab> in the file counts for.
+	tabstop = 4,                                 -- Number of spaces that a <Tab> in the file counts for.
+	shiftwidth = 4,                              -- Number of spaces to use for each step of (auto)indent.
+	softtabstop = 4,                             -- Number of spaces that a <Tab> in the file counts for.
 	expandtab = false,                           -- Use a tab over spaces since the size can be individual.
 	smarttab = true,                             -- Smart indent and remove of tabs/spaces 
 	wrap = false,                                -- Long lines wrap to the next line when enabled

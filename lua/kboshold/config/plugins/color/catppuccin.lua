@@ -31,7 +31,7 @@ return {
 			}
 
 			local highlights = {
-				Whitespace = { fg = util.color.lighten(colors.base, 0.08)},
+				Whitespace = { fg = util.color.lighten(colors.base, 0.06)},
 
 				CmpDocBorder = { fg = "#45475a"},
 				CmpBorder = { fg = "#45475a"},
@@ -46,10 +46,10 @@ return {
 			for _, accent in ipairs(accents) do
 				local key = accent:sub(1, 1):upper() .. accent:sub(2)
 				highlights["Indent" .. key] = {
-					fg = util.color.interpolate(colors.base, colors[accent], 0.92)
+					fg = util.color.interpolate(colors.base, colors[accent], 0.94)
 				}
 				highlights["IndentScope" .. key] = {
-					fg = util.color.interpolate(colors.base, colors[accent], 0.8)
+					fg = util.color.interpolate(colors.base, colors[accent], 0.88)
 				}
 			end
 
