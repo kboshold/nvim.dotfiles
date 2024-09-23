@@ -33,8 +33,8 @@ return {
 			local highlights = {
 				Whitespace = { fg = util.color.lighten(colors.base, 0.06)},
 
-				CmpDocBorder = { fg = "#45475a"},
-				CmpBorder = { fg = "#45475a"},
+				CmpDocBorder = { fg = colors.surface1},
+				CmpBorder = { fg = colors.surface1},
 
 				CmpItemAbbr = { fg = colors.text },
 				CmpItemMenu = { fg = colors.text },
