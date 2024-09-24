@@ -1,8 +1,4 @@
 <div align='center'>
-   <picture>
-      <source media="(prefers-color-scheme: dark)" type="image/svg+xml" srcset="./docs/assets/empty.svg">
-      <img alt="This logo recommends users to use a dark mode if they are not already doing so." src="https://img.shields.io/badge/Please%20really%20consider%20using%20a%20dark%20mode.%20Thanks-d20f39?style=for-the-badge">
-   </picture>
    <p>
       <a href="https://github.com/kpalatzky/nvim.dotfiles#is=awesome">
          <picture>
@@ -24,7 +20,6 @@
             <img alt="Logo with the Lettering Neovim and a lazy ninja on the left" src="https://img.shields.io/badge/%3E%3D0.10.0-40a02b?logo=neovim&label=neovim&labelColor=1e66f5">
          </picture>
        </a>
-
    </p>
    <hr>
    <p>
