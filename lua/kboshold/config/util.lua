@@ -7,9 +7,16 @@ local function rgb_to_hex(r, g, b)
 end
 
 local function hex_to_rgb(hex)
-	local r = tonumber(hex:sub(2, 3), 16)
-	local g = tonumber(hex:sub(4, 5), 16)
-	local b = tonumber(hex:sub(6, 7), 16)
+	if type(hex) == "number" then
+			local r = math.floor(hex / 65536)
+			local g = math.floor((hex / 256) % 256)
+			local b = math.floor(hex % 256)
+	else
+			local r = tonumber(hex:sub(2, 3), 16)
+			local g = tonumber(hex:sub(4, 5), 16)
+			local b = tonumber(hex:sub(6, 7), 16)
+	end
+	
 	return r, g, b
 end
 
