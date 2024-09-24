@@ -1,16 +1,30 @@
-<div align="center">
+data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='0' height='0' viewBox='0 0 0 0'><text x='0' y='0' font-size='0' fill='#000'>Real developers use dark mode. You seem to be a real developer!</text></svg>
+<div align='center'>
    <p>
       <a href="https://github.com/kpalatzky/nvim.dotfiles#is=awesome">
-        <img alt="Logo with the Lettering Neovim and a lazy ninja on the left" src="./docs/assets/logo.svg"/>
+         <picture>
+            <source media="(prefers-color-scheme: dark)" type="image/svg+xml" srcset="./docs/assets/logo_dark.svg">
+            <img alt="Logo with the Lettering Neovim and a lazy ninja on the left" src="./docs/assets/logo_light.sv">
+         </picture>
       </a>
    </p>
    <p>
       <a href="https://github.com/kpalatzky/nvim.dotfiles/blob/master/LICENSE">
-        <img src="https://img.shields.io/github/license/kpalatzky/nvim.dotfiles.svg" alt="MIT License"/>
+         <picture>
+            <source media="(prefers-color-scheme: dark)" type="image/svg+xml" srcset="https://img.shields.io/github/license/kpalatzky/nvim.dotfiles.svg?color=cba6f7&labelColor=b4befe">
+            <img src="https://img.shields.io/github/license/kpalatzky/nvim.dotfiles.svg?color=8839ef" alt="MIT License"/>
+         </picture>
       </a>
       <a href="https://github.com/neovim/neovim#is-also-awesome">
-         <img alt="Neovim" src="https://img.shields.io/badge/%3E%3D0.9.2-5e9a3d?logo=neovim&label=neovim&labelColor=1375b2"/>
+         <picture>
+            <source media="(prefers-color-scheme: dark)" type="image/svg+xml" srcset="https://img.shields.io/badge/%3E%3D0.10.0-a6e3a1?logo=neovim&label=neovim&labelColor=74c7ec&logoColor=313244">
+            <img alt="Logo with the Lettering Neovim and a lazy ninja on the left" src="https://img.shields.io/badge/%3E%3D0.10.0-40a02b?logo=neovim&label=neovim&labelColor=1e66f5">
+         </picture>
        </a>
+      <picture>
+         <source media="(prefers-color-scheme: dark)" type="image/svg+xml" srcset="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScwJyBoZWlnaHQ9JzAnIHZpZXdCb3g9JzAgMCAwIDAnPjx0ZXh0IHg9JzAnIHk9JzAnIGZvbnQtc2l6ZT0nMCcgZmlsbD0nIzAwMCc+RWNodGUgRW50d2lja2xlciB2ZXJ3bmVkbmUgZGVuIERhcmsgTW9kZS4gRHUgYmlzdCBhbnNjaGVpbmVuZCBlaW4gZWNodGVyIEVudHdpY2tsZXIhPC90ZXh0Pjwvc3ZnPg==">
+         <img alt="This logo recommends users to use a dark mode if they are not already doing so." src="https://img.shields.io/badge/Please%20really%20consider%20using%20a%20dark%20mode.%20Thanks-fab387?style=for-the-badge">
+      </picture>
    </p>
    <hr>
    <p>
@@ -26,16 +40,12 @@
 
 | Tool       | Version   | Usage                                                                                 | Note                                                                                                      |
 | ---------- | --------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| Neovim     | >= 0.9.2  | <img src="https://img.shields.io/badge/required-800000?style=flat" alt="Required"/>   | [Installation Guide](https://github.com/neovim/neovim/blob/master/INSTALL.md#is-also-awesome)             |
+| Neovim     | >= 0.10.0  | <img src="https://img.shields.io/badge/required-800000?style=flat" alt="Required"/>   | [Installation Guide](https://github.com/neovim/neovim/blob/master/INSTALL.md#is-also-awesome)             |
 | Git        | >= 2.19.0 | <img src="https://img.shields.io/badge/required-800000?style=flat" alt="Required"/>   | [Download](https://git-scm.com/downloads#is-also-awesome)                                                 |
 | NerdFont   | -         | <img src="https://img.shields.io/badge/suggested-392361?style=flat" alt="Suggested"/> | [Download](https://www.nerdfonts.com/font-downloads#is-also-awesome) (i.e. `JetBrainsMono Nerd Font`)     |
 | C Compiler | -         | <img src="https://img.shields.io/badge/suggested-392361?style=flat" alt="Suggested"/> | See [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter?tab=readme-ov-file#requirements) |
 | ripgrep    | >= 14.1.0 | <img src="https://img.shields.io/badge/suggested-392361?style=flat" alt="Suggested"/> | [Installation](https://github.com/BurntSushi/ripgrep?tab=readme-ov-file#installation)                     |
 | fd         | >= 10.1.0 | <img src="https://img.shields.io/badge/suggested-392361?style=flat" alt="Suggested"/> | [Installation](https://github.com/sharkdp/fd?tab=readme-ov-file#installation)                             |
-| lazygit    | >= 0.43.1 | <img src="https://img.shields.io/badge/optional-31435e?style=flat" alt="Optional"/>   | [Installation](https://github.com/jesseduffield/lazygit?tab=readme-ov-file#installation)                  |
-<!-- | lazydocker | >= 0.23.3 | <img src="https://img.shields.io/badge/optional-31435e?style=flat" alt="Optional"/>   | [Installation](https://github.com/jesseduffield/lazydocker#installation)                                  |
-| lazynpm    | >= 0.1.4  | <img src="https://img.shields.io/badge/optional-31435e?style=flat" alt="Optional"/>   | [Installation](https://github.com/jesseduffield/lazynpm#installation)                                     | -->
-
 
 
 ### 🛠️ Installation
