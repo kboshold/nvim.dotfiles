@@ -34,17 +34,17 @@ vim.api.nvim_create_autocmd("BufEnter", {
 })
 
 -- Create an autocmd to set the ruler when entering a buffer
-vim.api.nvim_create_autocmd("ColorScheme", {
-	pattern = "*",
-	callback = function()
-		local util = require("kboshold.config.util")
-		local bg_color = vim.api.nvim_get_hl(0, {
-			name = "Normal",
-			create = false
-		}).bg
+-- vim.api.nvim_create_autocmd("ColorScheme", {
+-- 	pattern = "*",
+-- 	callback = function()
+-- 		local util = require("kboshold.config.util")
+-- 		local bg_color = vim.api.nvim_get_hl(0, {
+-- 			name = "Normal",
+-- 			create = false
+-- 		}).bg
 
-		local color = util.color.lighten(bg_color, 0.2)
-		vim.api.nvim_set_hl(0, "ColorColumn", { bg = new_color })
-		vim.api.nvim_set_hl(0, "CursorLine", { bg = new_color })
-	end
-})
+-- 		local color = util.color.lighten(bg_color, 0.2)
+-- 		vim.api.nvim_set_hl(0, "ColorColumn", { bg = new_color })
+-- 		vim.api.nvim_set_hl(0, "CursorLine", { bg = new_color })
+-- 	end
+-- })
