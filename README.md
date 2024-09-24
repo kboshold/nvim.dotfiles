@@ -1,4 +1,3 @@
-data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='0' height='0' viewBox='0 0 0 0'><text x='0' y='0' font-size='0' fill='#000'>Real developers use dark mode. You seem to be a real developer!</text></svg>
 <div align='center'>
    <p>
       <a href="https://github.com/kpalatzky/nvim.dotfiles#is=awesome">
@@ -22,7 +21,7 @@ data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='0' height
          </picture>
        </a>
       <picture>
-         <source media="(prefers-color-scheme: dark)" type="image/svg+xml" srcset="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScwJyBoZWlnaHQ9JzAnIHZpZXdCb3g9JzAgMCAwIDAnPjx0ZXh0IHg9JzAnIHk9JzAnIGZvbnQtc2l6ZT0nMCcgZmlsbD0nIzAwMCc+RWNodGUgRW50d2lja2xlciB2ZXJ3bmVkbmUgZGVuIERhcmsgTW9kZS4gRHUgYmlzdCBhbnNjaGVpbmVuZCBlaW4gZWNodGVyIEVudHdpY2tsZXIhPC90ZXh0Pjwvc3ZnPg==">
+         <source media="(prefers-color-scheme: dark)" type="image/svg+xml" srcset="./docs/assets/empty.svg">
          <img alt="This logo recommends users to use a dark mode if they are not already doing so." src="https://img.shields.io/badge/Please%20really%20consider%20using%20a%20dark%20mode.%20Thanks-fab387?style=for-the-badge">
       </picture>
    </p>
