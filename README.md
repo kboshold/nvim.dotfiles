@@ -3,7 +3,7 @@
       <a href="https://github.com/kpalatzky/nvim.dotfiles#is=awesome">
          <picture>
             <source media="(prefers-color-scheme: dark)" type="image/svg+xml" srcset="./docs/assets/logo_dark.svg">
-            <img alt="Logo with the Lettering Neovim and a lazy ninja on the left" src="./docs/assets/logo_light.sv">
+            <img alt="Logo with the Lettering Neovim and a lazy ninja on the left" src="./docs/assets/logo_light.svg">
          </picture>
       </a>
    </p>
@@ -22,7 +22,7 @@
        </a>
       <picture>
          <source media="(prefers-color-scheme: dark)" type="image/svg+xml" srcset="./docs/assets/empty.svg">
-         <img alt="This logo recommends users to use a dark mode if they are not already doing so." src="https://img.shields.io/badge/Please%20really%20consider%20using%20a%20dark%20mode.%20Thanks-fab387?style=for-the-badge">
+         <img alt="This logo recommends users to use a dark mode if they are not already doing so." src="https://img.shields.io/badge/Please%20really%20consider%20using%20a%20dark%20mode.%20Thanks-d20f39?style=for-the-badge">
       </picture>
    </p>
    <hr>
