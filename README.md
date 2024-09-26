@@ -35,8 +35,8 @@
 
 | Tool       | Version   | Usage                                                                                 | Note                                                                                                      |
 | ---------- | --------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| Neovim     | >= 0.10.0  | <img src="https://img.shields.io/badge/required-f38ba8?style=flat" alt="Required"/>   | [Installation Guide](https://github.com/neovim/neovim/blob/master/INSTALL.md#is-also-awesome)             |
-| Git        | >= 2.19.0 | <img src="https://img.shields.io/badge/required-f38ba8?style=flat" alt="Required"/>   | [Download](https://git-scm.com/downloads#is-also-awesome)                                                 |
+| Neovim     | >= 0.10.0  | <img src="https://img.shields.io/badge/required-f491ac?style=flat" alt="Required"/>   | [Installation Guide](https://github.com/neovim/neovim/blob/master/INSTALL.md#is-also-awesome)             |
+| Git        | >= 2.19.0 | <img src="https://img.shields.io/badge/required-f491ac?style=flat" alt="Required"/>   | [Download](https://git-scm.com/downloads#is-also-awesome)                                                 |
 | NerdFont   | -         | <img src="https://img.shields.io/badge/suggested-cba6f7?style=flat" alt="Suggested"/> | [Download](https://www.nerdfonts.com/font-downloads#is-also-awesome) (i.e. `JetBrainsMono Nerd Font`)     |
 | C Compiler | -         | <img src="https://img.shields.io/badge/suggested-cba6f7?style=flat" alt="Suggested"/> | See [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter?tab=readme-ov-file#requirements) |
 | ripgrep    | >= 14.1.0 | <img src="https://img.shields.io/badge/suggested-cba6f7?style=flat" alt="Suggested"/> | [Installation](https://github.com/BurntSushi/ripgrep?tab=readme-ov-file#installation)                     |
