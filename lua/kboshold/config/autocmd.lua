@@ -34,37 +34,17 @@ vim.api.nvim_create_autocmd("BufEnter", {
 })
 
 -- Create an autocmd to set the ruler when entering a buffer
-vim.api.nvim_create_autocmd("ColorScheme", {
-	pattern = "*",
-	callback = function()
-		-- Get the current background color
-		local bg_color = vim.api.nvim_get_hl(0, {
-			name = "Normal",
-			create = false
-		}).bg
+-- vim.api.nvim_create_autocmd("ColorScheme", {
+-- 	pattern = "*",
+-- 	callback = function()
+-- 		local util = require("kboshold.config.util")
+-- 		local bg_color = vim.api.nvim_get_hl(0, {
+-- 			name = "Normal",
+-- 			create = false
+-- 		}).bg
 
-		-- require("notify")("GOT COLOR " .. tostring(bg_color))
-		-- if true then return end;
-		--
-		-- Convert the color to RGB
-		local r = math.floor(bg_color / 65536)
-		local g = math.floor((bg_color / 256) % 256)
-		local b = math.floor(bg_color % 256)
-
-		-- require("notify")("GOT COLOR " .. tostring(r) .. " " .. tostring(bg_color))
-		-- if true then return end;
-
-		-- Lighten the color by 10%
-		r = math.min(255, r + (255 - r) * 0.02)
-		g = math.min(255, g + (255 - g) * 0.02)
-		b = math.min(255, b + (255 - b) * 0.02)
-
-		-- Convert RGB back to hexadecimal
-		local new_color = string.format("#%02x%02x%02x", r, g, b)
-
-		-- Set the new color to ColorColumn
-		vim.api.nvim_set_hl(0, "ColorColumn", { bg = new_color })
-		vim.api.nvim_set_hl(0, "CursorLine", { bg = new_color })
-
-	end
-})
+-- 		local color = util.color.lighten(bg_color, 0.2)
+-- 		vim.api.nvim_set_hl(0, "ColorColumn", { bg = new_color })
+-- 		vim.api.nvim_set_hl(0, "CursorLine", { bg = new_color })
+-- 	end
+-- })
