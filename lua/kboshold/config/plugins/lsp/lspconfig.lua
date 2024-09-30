@@ -4,31 +4,35 @@ return {
 		"mason.nvim",
 		"williamboman/mason-lspconfig.nvim"
 	},
-	config = function() 
+	config = function()
 		local lspconfig = require("lspconfig");
 
-		local virtual_text = {
-			prefix = '▎',
-			spacing = 0,
-			virt_text_win_col = 120,
-			virt_text_pos = "inline",
-			-- format = function(diagnostic)
-			--   return diagnostic.message:gsub("[\n\t]+", " "):gsub("^%s+", ""):gsub("%s+", " ")
-			-- end,
-		}
+		local function get_virtual_text_config()
+			local width = vim.api.nvim_win_get_width(0)
+			local virtual_text = {
+				prefix = '▎',
+				spacing = 0
+			}
 
-		local width = vim.api.nvim_win_get_width(0)
-		if width < 100 then
-			virtual_text.virt_text_pos = 'eol'
-			virtual_text.virt_text_win_col = 0
-			virtual_text.spacing = 4
+			if width > 150 then
+				virtual_text.virt_text_pos = 'inline'
+				virtual_text.virt_text_win_col = 120
+			elseif width > 130 then
+				virtual_text.virt_text_pos = 'inline'
+				virtual_text.virt_text_win_col = 100
+			else 
+				virtual_text.virt_text_pos = 'eol'
+				virtual_text.spacing = 4
+			end
+
+			return virtual_text
 		end
 
 		vim.diagnostic.config({
 			underline = true,
 			update_in_insert = true,
 			severity_sort = true,
-			virtual_text = virtual_text,
+			virtual_text = get_virtual_text_config(),
 			signs = {
 				--support diagnostic severity / diagnostic type name
 				text = {
@@ -56,6 +60,24 @@ return {
 				},
 			},
 		});
+
+
+		-- auto optimize on screen size change	
+		vim.api.nvim_create_autocmd("VimResized", {
+			pattern = "*",
+			group = vim.api.nvim_create_augroup("LspConfigResize", { clear = true }),
+			callback = function() 
+				vim.diagnostic.config({
+					virtual_text = get_virtual_text_config(),
+				})
+			end,
+		})
+
+		vim.keymap.set("n", "<leader>dd", function()
+			vim.diagnostic.config({
+				virtual_text = get_virtual_text_config(),
+			})
+		end, {});
 
 		local on_attach = function(_, bufnr)
 			local attach_opts = { silent = true, buffer = bufnr }
