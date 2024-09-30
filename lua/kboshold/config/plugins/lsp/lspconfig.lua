@@ -4,22 +4,31 @@ return {
 		"mason.nvim",
 		"williamboman/mason-lspconfig.nvim"
 	},
-	config = function()
+	config = function() 
 		local lspconfig = require("lspconfig");
+
+		local virtual_text = {
+			prefix = '▎',
+			spacing = 0,
+			virt_text_win_col = 120,
+			virt_text_pos = "inline",
+			-- format = function(diagnostic)
+			--   return diagnostic.message:gsub("[\n\t]+", " "):gsub("^%s+", ""):gsub("%s+", " ")
+			-- end,
+		}
+
+		local width = vim.api.nvim_win_get_width(0)
+		if width < 100 then
+			virtual_text.virt_text_pos = 'eol'
+			virtual_text.virt_text_win_col = 0
+			virtual_text.spacing = 4
+		end
 
 		vim.diagnostic.config({
 			underline = true,
 			update_in_insert = true,
 			severity_sort = true,
-			virtual_text = {
-				prefix = '▎',
-				spacing = 0,
-				virt_text_win_col = 120,
-				virt_text_pos = "right_align",
-				-- format = function(diagnostic)
-				--   return diagnostic.message:gsub("[\n\t]+", " "):gsub("^%s+", ""):gsub("%s+", " ")
-				-- end,
-			},
+			virtual_text = virtual_text,
 			signs = {
 				--support diagnostic severity / diagnostic type name
 				text = {

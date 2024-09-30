@@ -40,8 +40,30 @@ return {
 
 			require("neo-tree.command").execute({ action = "show" })
 		end
-		vim.api.nvim_create_autocmd({ "BufEnter" }, { callback = on_buf_enter })
+		
+		-- only  open neotree if size is > 158
+		if vim.api.nvim_win_get_width(0) > 158 then
+			vim.api.nvim_create_autocmd({ "BufEnter" }, { callback = on_buf_enter })
+		end
+			
+		-- toggle neotree on resize
+		local function on_resized() 
+			local neo_tree_command = require("neo-tree.command")
+			if vim.api.nvim_win_get_width(0) > 158 then
+				neo_tree_command.execute({ action = "show" })
+			else
+				neo_tree_command.execute({ action = "close" })
+			end
+		end
 
+		vim.api.nvim_create_autocmd("VimResized", {
+			pattern = "*",
+			group = vim.api.nvim_create_augroup("NvimTreeResize", { clear = true }),
+			callback = function() 
+				-- Run deferred since it will show the wrong layout otherwise
+				vim.defer_fn(on_resized, 10)
+			end,
+		})
 	end,
 	opts = {
 		close_if_last_window = true,
@@ -99,7 +121,8 @@ return {
 		},
 		window = {
 			position = "left",
-			width = 38
+			width = 38,
+			mappings = {}
 		},
 	},
 }
