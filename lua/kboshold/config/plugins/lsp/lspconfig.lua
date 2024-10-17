@@ -103,7 +103,15 @@ return {
 			has_cmp and cmp_nvim_lsp.default_capabilities() or {}
 		)
 
-		local servers = {'rust_analyzer', 'ts_ls', 'angularls', 'ansiblels', 'bashls', 'cssls', 'yamlls' }
+		local servers = {
+			'rust_analyzer',
+			'angularls',
+			'ansiblels',
+			'bashls',
+			'cssls',
+			'yamlls',
+			'astro',
+		}
 		-- local servers = {}
 		for _, lsp in ipairs(servers) do
 			lspconfig[lsp].setup {
@@ -111,6 +119,17 @@ return {
 				capabilities = capabilities,
 			}
 		end
+
+		lspconfig.denols.setup({
+			on_attach = on_attach,
+			root_dir = lspconfig.util.root_pattern("deno.json", "deno.jsonc"),
+		})
+
+		lspconfig.ts_ls.setup({
+			on_attach = on_attach,
+			root_dir = lspconfig.util.root_pattern("package.json"),
+			single_file_support = false
+		})
 
 		-- Setup lsp servers
 		lspconfig.lua_ls.setup({

@@ -9,6 +9,8 @@ return {
 				"javascript",
 				"typescript",
 				"c",
+				"css",
+				"scss",
 				"lua",
 				"rust",
 				"jsdoc",
