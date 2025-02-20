@@ -42,14 +42,14 @@ return {
 		end
 		
 		-- only  open neotree if size is > 158
-		if vim.api.nvim_win_get_width(0) > 158 then
+		if vim.o.columns > 158 then
 			vim.api.nvim_create_autocmd({ "BufEnter" }, { callback = on_buf_enter })
 		end
 			
 		-- toggle neotree on resize
 		local function on_resized() 
 			local neo_tree_command = require("neo-tree.command")
-			if vim.api.nvim_win_get_width(0) > 158 then
+			if vim.o.columns > 158 then
 				neo_tree_command.execute({ action = "show" })
 			else
 				neo_tree_command.execute({ action = "close" })
