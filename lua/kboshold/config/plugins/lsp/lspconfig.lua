@@ -111,6 +111,7 @@ return {
 			'cssls',
 			'yamlls',
 			'astro',
+			'typescript'
 		}
 		-- local servers = {}
 		for _, lsp in ipairs(servers) do
