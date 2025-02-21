@@ -1,6 +1,12 @@
+local function is_copilot_authenticated()
+  local auth_status = vim.fn.system("copilot auth status")
+  return auth_status:match("Logged in") ~= nil
+end
+
 return {
   "yetone/avante.nvim",
   event = "VeryLazy",
+	enabled = is_copilot_authenticated(),
   lazy = false,
   version = false, -- Set this to "*" to always pull the latest release version, or set it to false to update to the latest code changes.
   opts = {
