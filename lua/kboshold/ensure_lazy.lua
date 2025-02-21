@@ -3,9 +3,9 @@
 -- The configuration of lazy itself can be found in ./config/lazy.lua 
 -- The configuration of the plugins can be found in ./config/plugins/
 --
-if vim.fn.filewritable(vim.fn.stdpath("config") .. "/lazy-lock.json") ~= 1
-  -- File is not writable, set to data directory
-  vim.g.lazylock_json = vim.fn.stdpath("data") .. "/lazy-lock.json"
+if vim.fn.filewritable(vim.fn.stdpath("config") .. "/lazy-lock.json") ~= 1 then
+    -- File is not writable, set to data directory
+    vim.g.lazylock_json = vim.fn.stdpath("data") .. "/lazy-lock.json"
 end
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
