@@ -1,3 +1,8 @@
+local lockfile = vim.fn.stdpath("config") .. "/lazy-lock.json"
+if vim.fn.filewritable(lockfile) ~= 1 then
+    lockfile = vim.fn.stdpath("data") .. "/lazy-lock.json"
+end
+
 require("lazy").setup({
 	spec = {
 		-- We could do this dynamic using vim.fn.readdir but why should we waste time?
@@ -7,6 +12,7 @@ require("lazy").setup({
 		{ import = "kboshold.config.plugins.ui" },
 		{ import = "kboshold.config.plugins.util" }
 	},
+	lockfile = lockfile,
 	defaults = {
 		lazy = false,
 		version = false
