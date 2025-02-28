@@ -28,29 +28,23 @@ return {
 			return virtual_text
 		end
 
+		-- Basic diagnostic config
 		vim.diagnostic.config({
 			underline = true,
 			update_in_insert = true,
 			severity_sort = true,
 			virtual_text = get_virtual_text_config(),
 			signs = {
-				--support diagnostic severity / diagnostic type name
 				text = {
 					[vim.diagnostic.severity.ERROR] = '󰅚',
 					[vim.diagnostic.severity.WARN] = '󰀪',
 					[vim.diagnostic.severity.HINT] = '󰌶',
-					[vim.diagnostic.severity.INFO] = ''
+					[vim.diagnostic.severity.INFO] = ''
 				},
 			},
-			inlay_hints = {
-				enabled = true,
-			},
-			codelens = {
-				enabled = false,
-			},
-			document_highlight = {
-				enabled = true,
-			},
+			inlay_hints = { enabled = true },
+			codelens = { enabled = false },
+			document_highlight = { enabled = true },
 			capabilities = {
 				workspace = {
 					fileOperations = {
@@ -61,24 +55,18 @@ return {
 			},
 		});
 
+		-- Cache capabilities
+		local capabilities = (function()
+			local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+			return vim.tbl_deep_extend(
+				"force",
+				{},
+				vim.lsp.protocol.make_client_capabilities(),
+				has_cmp and cmp_nvim_lsp.default_capabilities() or {}
+			)
+		end)()
 
-		-- auto optimize on screen size change	
-		vim.api.nvim_create_autocmd("VimResized", {
-			pattern = "*",
-			group = vim.api.nvim_create_augroup("LspConfigResize", { clear = true }),
-			callback = function() 
-				vim.diagnostic.config({
-					virtual_text = get_virtual_text_config(),
-				})
-			end,
-		})
-
-		vim.keymap.set("n", "<leader>dd", function()
-			vim.diagnostic.config({
-				virtual_text = get_virtual_text_config(),
-			})
-		end, {});
-
+		-- Common on_attach function
 		local on_attach = function(_, bufnr)
 			local attach_opts = { silent = true, buffer = bufnr }
 			vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, attach_opts)
@@ -94,84 +82,107 @@ return {
 			vim.keymap.set('n', 'so', require('telescope.builtin').lsp_references, attach_opts)
 		end
 
-		-- may enable cmp
-		local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
-		local capabilities  = vim.tbl_deep_extend(
-			"force",
-			{},
-			vim.lsp.protocol.make_client_capabilities(),
-			has_cmp and cmp_nvim_lsp.default_capabilities() or {}
-		)
-
+		-- Server configurations
 		local servers = {
-			'rust_analyzer',
-			'angularls',
-			'ansiblels',
-			'bashls',
-			'cssls',
-			'yamlls',
-			'astro',
-			'typescript'
-		}
-		-- local servers = {}
-		for _, lsp in ipairs(servers) do
-			lspconfig[lsp].setup {
-				on_attach = on_attach,
-				capabilities = capabilities,
-			}
-		end
-
-		lspconfig.denols.setup({
-			on_attach = on_attach,
-			root_dir = lspconfig.util.root_pattern("deno.json", "deno.jsonc"),
-		})
-
-		lspconfig.ts_ls.setup({
-			on_attach = on_attach,
-			root_dir = lspconfig.util.root_pattern("package.json"),
-			single_file_support = false
-		})
-
-		-- Setup lsp servers
-		lspconfig.lua_ls.setup({
-			capabilities = capabilities,
-			on_attach = on_attach,
-			on_init = function(client)
-				if client.workspace_folders then
-					local path = client.workspace_folders[1].name
-					if vim.uv.fs_stat(path..'/.luarc.json') or vim.uv.fs_stat(path..'/.luarc.jsonc') then
-						return
+			rust_analyzer = {},
+			angularls = {},
+			ansiblels = {},
+			bashls = {},
+			cssls = {},
+			yamlls = {},
+			astro = {},
+			denols = {
+				root_dir = lspconfig.util.root_pattern("deno.json", "deno.jsonc"),
+			},
+			ts_ls = {
+				root_dir = lspconfig.util.root_pattern("package.json"),
+				single_file_support = false
+			},
+			lua_ls = {
+				on_init = function(client)
+					if client.workspace_folders then
+						local path = client.workspace_folders[1].name
+						if vim.uv.fs_stat(path..'/.luarc.json') or vim.uv.fs_stat(path..'/.luarc.jsonc') then
+							return
+						end
 					end
-				end
 
-				client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
-					runtime = {
-						-- Tell the language server which version of Lua you're using
-						-- (most likely LuaJIT in the case of Neovim)
-						version = 'LuaJIT'
-					},
-					-- Make the server aware of Neovim runtime files
-					workspace = {
-						checkThirdParty = false,
-						library = {
-							vim.env.VIMRUNTIME,
-							-- Depending on the usage, you might want to add additional paths here.
-							"${3rd}/luv/library"
-							-- "${3rd}/busted/library",
+					client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua or {}, {
+						runtime = {
+							version = 'LuaJIT'
+						},
+						workspace = {
+							checkThirdParty = false,
+							library = {
+								vim.env.VIMRUNTIME,
+								"${3rd}/luv/library"
+							}
 						}
-						-- or pull in all of 'runtimepath'. NOTE: this is a lot slower
-						-- library = vim.api.nvim_get_runtime_file("", true)
+					})
+				end,
+				settings = {
+					Lua = {
+						completion = {
+							callSnippet = 'Replace',
+						},
 					}
-				})
-			end,
-			settings = {
-				Lua = {
-					completion = {
-						callSnippet = 'Replace',
-					},
 				}
 			}
+		}
+
+		-- Lazy load servers based on file type
+		vim.api.nvim_create_autocmd("FileType", {
+			group = vim.api.nvim_create_augroup("LspAttach_" .. vim.api.nvim_win_get_number(0), { clear = true }),
+			callback = function(args)
+				local ft = args.match
+				local clients = vim.lsp.get_active_clients({ bufnr = args.buf })
+				
+				-- Skip if LSP is already attached
+				if #clients > 0 then return end
+
+				-- Map filetypes to server names
+				local ft_servers = {
+					rust = "rust_analyzer",
+					typescript = "ts_ls",
+					javascript = "ts_ls",
+					lua = "lua_ls",
+					yaml = "yamlls",
+					css = "cssls",
+					html = "html",
+					sh = "bashls",
+					bash = "bashls",
+					astro = "astro",
+					angular = "angularls",
+					ansible = "ansiblels",
+				}
+
+				local server_name = ft_servers[ft]
+				if server_name then
+					local server_config = servers[server_name] or {}
+					local final_config = vim.tbl_deep_extend("force", {
+						capabilities = capabilities,
+						on_attach = on_attach,
+					}, server_config)
+
+					lspconfig[server_name].setup(final_config)
+				end
+			end,
 		})
 
+		-- Window resize handler with debounce
+		local resize_timer = nil
+		vim.api.nvim_create_autocmd("VimResized", {
+			group = vim.api.nvim_create_augroup("LspConfigResize", { clear = true }),
+			callback = function()
+				if resize_timer then
+					vim.fn.timer_stop(resize_timer)
+				end
+				resize_timer = vim.fn.timer_start(100, function()
+					vim.diagnostic.config({
+						virtual_text = get_virtual_text_config(),
+					})
+				end)
+			end,
+		})
 	end
 }
