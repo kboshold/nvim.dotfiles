@@ -6,13 +6,21 @@ end
 require("lazy").setup({
 	spec = {
 		-- add LazyVim and import its plugins
-		{ "LazyVim/LazyVim", import = "lazyvim.plugins" },
+		{
+			"LazyVim/LazyVim",
+			import = "lazyvim.plugins"
+		},
+
 		-- import/override with your plugins
-		{ import = "kboshold.config.plugins.lsp" },
-		{ import = "kboshold.config.plugins.color" },
-		{ import = "kboshold.config.plugins.ui" },
-		{ import = "kboshold.config.plugins.util" }
+		{ import = "kboshold.plugins.ai" },
+		{ import = "kboshold.plugins.color" },
+		{ import = "kboshold.plugins.ui" },
+		{ import = "kboshold.plugins.util" },
+		{ import = "kboshold.plugins.lsp" },
+		{ import = "kboshold.plugins.navigation" },
+		{ import = "kboshold.plugins.lazy" },
 	},
+	lockfile = lockfile,
 	defaults = {
 		-- By default, only LazyVim plugins will be lazy-loaded. Your custom plugins will load during startup.
 		-- If you know what you're doing, you can set this to `true` to have all your custom plugins lazy-loaded by default.
@@ -26,7 +34,7 @@ require("lazy").setup({
 	checker = {
 		enabled = true, -- check for plugin updates periodically
 		notify = false, -- notify on update
-	}, -- automatically check for plugin updates
+	},            -- automatically check for plugin updates
 	performance = {
 		rtp = {
 			-- disable some rtp plugins

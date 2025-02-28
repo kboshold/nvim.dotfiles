@@ -9,8 +9,8 @@ if vim.fn.has("nvim-0.10.0") == 0 then
 end
 
 require('kboshold.config.options')
-require('kboshold.config.autocmd')
+require('kboshold.config.autocmds')
 require('kboshold.config.lazy')
 require('kboshold.config.keymaps')
 
-vim.cmd [[colorscheme catppuccin]]
+-- vim.cmd [[colorscheme catppuccin]]
