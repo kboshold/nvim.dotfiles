@@ -13,7 +13,7 @@ return {
 					jump = { close = false },
 					auto_close = false
 				}
-			}
+			},
 		}
 	},
 	init = function()
@@ -59,8 +59,6 @@ return {
 					picker:close()
 				end
 			end
-
-			print("old_size: " .. old_size .. " new_size: " .. vim.o.columns .. " | ")
 
 			old_size = vim.o.columns;
 		end
