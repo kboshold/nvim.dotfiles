@@ -21,7 +21,7 @@ M.color.darken = function(color, ratio)
 	return rgb_to_hex(r, g, b)
 end
 
-M.color.lighten = function(color, ratio)
+M.color.lighten = function(color, ratio) 
 	local r, g, b = hex_to_rgb(color)
 	r = math.min(255, math.floor(r + 255 * ratio))
 	g = math.min(255, math.floor(g + 255 * ratio))
@@ -39,5 +39,6 @@ M.color.interpolate = function(base, accent, ratio)
 
 	return rgb_to_hex(interpolated_r, interpolated_g, interpolated_b)
 end
+
 
 return M
