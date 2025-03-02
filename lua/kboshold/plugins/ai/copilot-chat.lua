@@ -51,7 +51,7 @@ return {
 					local buf = vim.api.nvim_win_get_buf(win)
 					if vim.api.nvim_get_option_value("filetype", { buf = buf }) == "copilot-chat" then
 						vim.api.nvim_set_current_win(win)
-						vim.cmd("normal! G$")
+						vim.cmd("normal! G$a")
 						found = true
 						break
 					end
