@@ -79,7 +79,8 @@ return {
 				ColorColumnBlue = { fg = util.color.interpolate(colors.base, colors.blue, 0.98) },
 				ColorColumnRed = { fg = util.color.interpolate(colors.base, colors.red, 0.98) },
 
-				SnacksPickerBorder = { fg = colors.lavender },
+				SnacksPickerBorder = { fg = colors.lavender, bg = colors.mantle },
+				SnacksPickerTree = { fg = colors.surface0 },		
 			}
 
 			for _, accent in ipairs(accents) do
