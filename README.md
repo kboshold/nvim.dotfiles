@@ -34,13 +34,12 @@
 
 | Tool       | Version   | Usage                                                                                 | Note                                                                                                      |
 | ---------- | --------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| Neovim     | >= 0.10.0  | <img src="https://img.shields.io/badge/required-f491ac?style=flat" alt="Required"/>   | [Installation Guide](https://github.com/neovim/neovim/blob/master/INSTALL.md#is-also-awesome)             |
+| Neovim     | >= 0.10.0 | <img src="https://img.shields.io/badge/required-f491ac?style=flat" alt="Required"/>   | [Installation Guide](https://github.com/neovim/neovim/blob/master/INSTALL.md#is-also-awesome)             |
 | Git        | >= 2.19.0 | <img src="https://img.shields.io/badge/required-f491ac?style=flat" alt="Required"/>   | [Download](https://git-scm.com/downloads#is-also-awesome)                                                 |
 | NerdFont   | -         | <img src="https://img.shields.io/badge/suggested-cba6f7?style=flat" alt="Suggested"/> | [Download](https://www.nerdfonts.com/font-downloads#is-also-awesome) (i.e. `JetBrainsMono Nerd Font`)     |
 | C Compiler | -         | <img src="https://img.shields.io/badge/suggested-cba6f7?style=flat" alt="Suggested"/> | See [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter?tab=readme-ov-file#requirements) |
 | ripgrep    | >= 14.1.0 | <img src="https://img.shields.io/badge/suggested-cba6f7?style=flat" alt="Suggested"/> | [Installation](https://github.com/BurntSushi/ripgrep?tab=readme-ov-file#installation)                     |
 | fd         | >= 10.1.0 | <img src="https://img.shields.io/badge/suggested-cba6f7?style=flat" alt="Suggested"/> | [Installation](https://github.com/sharkdp/fd?tab=readme-ov-file#installation)                             |
-
 
 ### 🛠️ Installation
 
@@ -63,6 +62,7 @@ git clone https://github.com/kboshold/nvim.dotfiles ~/.config/nvim
 ```
 
 Start Neovim:
+
 ```sh
 nvim
 ```
@@ -70,10 +70,10 @@ nvim
 #### 🦄 Uni-Line Installation
 
 > [!WARNING]  
-> This does a little more than the script above*. It also checks the necessary dependencies and tries to install them.
-> You will of course be asked before the installation. 
-> 
-> *I will implement it in the future!
+> This does a little more than the script above\*. It also checks the necessary dependencies and tries to install them.
+> You will of course be asked before the installation.
+>
+> \*I will implement it in the future!
 
 ```sh
 curl https://github.com/kboshold/nvim.dotfiles/install.sh | bash
@@ -85,8 +85,6 @@ The [kboshold/dotfiles](https://github.com/kboshold/dotfiles) also include the l
 
 ### ⚙️ Configuration
 
-
-
 ## 🫅 Usage
 
 ### ⌨️ Keymaps
@@ -94,9 +92,8 @@ The [kboshold/dotfiles](https://github.com/kboshold/dotfiles) also include the l
 > [!TIP]  
 > You can of course also view the keymaps directly in Neovim with `:nmap`, `:vmap` as usual (Typing `:help map` in Neovim will give you more info.)
 
-
 > [!IMPORTANT]  
-> The following keymaps are automatically extracted from the code via a pipeline and inserted here. Therefore, make sure that you have the latest version. 
+> The following keymaps are automatically extracted from the code via a pipeline and inserted here. Therefore, make sure that you have the latest version.
 
 <!-- generated-keymaps-start --!>
 
