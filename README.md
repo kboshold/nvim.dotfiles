@@ -23,7 +23,6 @@
    </p>
    <hr>
    <p>
-      <h3>⚠️🚧 This configuration is still under development 🚧⚠️<h3>
       <h3>💤 Want to be a lazy neo ninja? 💤</h3>
       <div>My personal Neovim configuration.</div>
    </p>
