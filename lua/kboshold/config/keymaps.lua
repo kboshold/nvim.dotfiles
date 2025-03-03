@@ -19,8 +19,8 @@ end, { desc = "Delete in Highlight Group" })
 
 vim.keymap.set("n", "cih", function()
   if set_marks_for_current_highlight() then
-    vim.cmd("normal! `<v`>d")
-    vim.cmd("startinsert!")
+    vim.cmd("normal! `<v`>")
+    vim.api.nvim_feedkeys("c", "n", false)
   end
 end, { desc = "Change in Highlight Group" })
 
