@@ -1,30 +1,36 @@
--- Options are automatically loaded before lazy.nvim startup
--- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
--- Add any additional options here
 local function assign(dest, src)
-	for k, v in pairs(src) do
-		dest[k] = v
-	end
+  for k, v in pairs(src) do
+    dest[k] = v
+  end
 end
 
 assign(vim.g, {
-	bigfile_size = 1024 * 1024 * 0.5,
-	-- defaults
-	ux_piped_input = 0,
+  bigfile_size = 1024 * 1024 * 0.5,
+  -- defaults
+  ux_piped_input = 0,
 
-	-- lazy defaults
-	lazyvim_cmp = "blink.cmp",
-	ai_cmp = true
+  -- lazy defaults
+  lazyvim_cmp = "blink.cmp",
+  ai_cmp = true,
 })
 -- assign options
 assign(vim.opt, {
-	listchars = {
-		space = '·',
-		tab = "▏ ",
-	},
+  listchars = {
+    space = "·",
+    tab = "▏ ",
+  },
 
-	completeopt = "menu,menuone,noselect,noinsert",
-	colorcolumn = '101,121',
-	signcolumn = "yes:2",
-	scrolloff = 10,
+  tabstop = 4, -- Number of spaces that a <Tab> in the file counts for.
+  shiftwidth = 4, -- Number of spaces to use for each step of (auto)indent.
+  softtabstop = 4, -- Number of spaces that a <Tab> in the file counts for.
+  expandtab = false, -- Use a tab over spaces since the size can be individual.
+  smarttab = true, -- Smart indent and remove of tabs/spaces
+  smartcase = true,
+  smartindent = true,
+
+  wrap = false, -- Long lines wrap to the next line when enabled
+  completeopt = "menu,menuone,popup,noinsert",
+  colorcolumn = "101,121",
+  signcolumn = "yes:2",
+  scrolloff = 10,
 })

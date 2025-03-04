@@ -1,8 +1,34 @@
--- Autocmds are automatically loaded on the VeryLazy event
--- Default autocmds that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/autocmds.lua
---
--- Add any additional autocmds here
--- with `vim.api.nvim_create_autocmd`
---
--- Or remove existing autocmds by their group name (which is prefixed with `lazyvim_` for the defaults)
--- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
+-- Set ux_piped_input to `1` for input streams
+vim.api.nvim_create_autocmd("StdinReadPost", {
+  callback = function()
+    vim.g.ux_piped_input = 1
+  end,
+})
+
+-- Change the color or the CursorLineNr depending on the mode
+local function update_cursor_line_nr()
+  local suffix = require("lualine.highlight").get_mode_suffix()
+
+  local cursor_line_hl = vim.api.nvim_get_hl(0, {
+    name = "CursorLine",
+    create = false,
+  })
+
+  local lualine_hl = vim.api.nvim_get_hl(0, {
+    name = "lualine_a" .. suffix,
+    create = false,
+  })
+
+  vim.api.nvim_set_hl(0, "CursorLineNr", {
+    fg = lualine_hl.bg,
+    bg = cursor_line_hl.bg,
+    bold = true,
+  })
+end
+
+vim.api.nvim_create_autocmd("ModeChanged", {
+  callback = update_cursor_line_nr,
+})
+vim.api.nvim_create_autocmd("BufEnter", {
+  callback = update_cursor_line_nr,
+})

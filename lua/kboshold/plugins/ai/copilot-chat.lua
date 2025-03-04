@@ -14,6 +14,7 @@ return {
     local user = vim.env.USER or "User"
     return {
       auto_insert_mode = true,
+      -- chat_autocomplete = false,
       model = "claude-3.7-sonnet",
       question_header = "#   " .. user .. " ",
       answer_header = "#   copilot ",
@@ -143,7 +144,7 @@ return {
         end
         vim.cmd("RenderMarkdown")
       end,
-      desc = "Add buffer to context (CopilotChat)",
+      desc = "Add/Remove buffer to context (CopilotChat)",
       mode = { "n", "v" },
     },
     {
