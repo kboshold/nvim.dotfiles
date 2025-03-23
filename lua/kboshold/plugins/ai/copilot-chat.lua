@@ -56,7 +56,7 @@ return {
   opts = function()
     local user = vim.env.USER or "User"
     return {
-      auto_insert_mode = true,
+      -- auto_insert_mode = true,
       -- chat_autocomplete = false,
       model = "claude-3.7-sonnet",
       question_header = "#   " .. user .. " ",
@@ -64,6 +64,13 @@ return {
       error_header = "#  error",
       separator = "",
       show_help = false,
+      context = "buffers",
+      mappings = {
+        reset = false,
+        show_diff = {
+          full_diff = true,
+        },
+      },
       window = {
         layout = "vertical",
         width = 0.3,
