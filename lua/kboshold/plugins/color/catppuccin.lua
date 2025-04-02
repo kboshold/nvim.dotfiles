@@ -66,6 +66,9 @@ return {
 			local highlights = {
 				Whitespace = { fg = util.color.lighten(colors.base, 0.06) },
 
+				SnacksDashboardHeader = { fg = colors.lavender },
+				SnacksDashboardAuthor = { fg = util.color.interpolate(colors.base, colors.lavender, 0.75) },
+
 				CmpDocBorder = { fg = colors.surface1 },
 				CmpBorder = { fg = colors.surface1 },
 

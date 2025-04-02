@@ -6,13 +6,7 @@ return {
 				pick = function(cmd, opts)
 					return LazyVim.pick(cmd, opts)()
 				end,
-				header = table.concat({
-					"    ____             ____           ",
-					"   / __ )____  _____/ __ \\___ _   __",
-					"  / __  / __ \\/ ___/ / / / _ \\ | / /",
-					" / /_/ / /_/ (__  ) /_/ /  __/ |/ / ",
-					"/_____/\\____/____/_____/\\___/|___/  "
-				}, "\n"),
+
 				-- stylua: ignore
 				---@type snacks.dashboard.Item[]
 				keys = {
@@ -24,6 +18,35 @@ return {
 					{ icon = "󰒲 ", key = "l", desc = "Lazy", action = ":Lazy" },
 					{ icon = " ", key = "q", desc = "Quit", action = ":qa" },
 				},
+			},
+			sections = {
+				{
+					text = {
+						table.concat({
+							"    ⠰⠿⠆⠾⠿⠿⠿⣶⣤                 ⢰⣶⣶⣶⣶⣶⣶⣦⣄                     ",
+							"    ⠰⠾⠶⠲⠆⠾⠿⢿⣿⡇ ⢀⣤⣴⣶⣦⣄⡀  ⣠⣴⣶⣤⣄⡀⢸⣿⣿⠉⠉⠉⠙⢿⣿⣧  ⣀⣤⣶⣦⣤⡀ ⣤⣤⡀   ⣠⣤⡀  ",
+							"    ⠶⠶⠶⠖⠶⠶⣶⣾⡿⠃⣰⣿⡿⠛⠛⠛⢿⣿⡄⣾⣿⡏⠉⠙⠿⠇⢸⣿⣿    ⠈⣿⣿⡆⣼⣿⠟⠛⠛⢿⣿⣆⢹⣿⣧  ⢰⣿⡿   ",
+							"  ⠰⠶⠆⠶⠶⠶⠶⠶⠿⢿⣷⡄⣿⣿⠁   ⢸⣿⣿⠘⠿⣿⣿⣶⣦⡀⢸⣿⣿    ⢀⣿⣿⢳⣿⣿⣿⣿⣿⣿⣿⡿ ⢻⣿⣧⢠⣿⡿⠁   ",
+							"   ⠶⠶⠶⠆⠶⠆⠶⠶⣾⣿⡇⢻⣿⣧⣀⣀⣠⣾⣿⠏⣴⣤⡀⠈⢙⣿⣿⢸⣿⣿⣀⣀⣀⣠⣾⣿⡟⠈⢿⣿⣄⣀⣀⣀⣤⡀  ⢻⣿⣿⡿⠁    ",
+							"   ⢶⣶⣶⣶⠆⢶⣶⣶⠿⠛  ⠙⠿⠿⣿⠿⠟⠋ ⠙⠿⠿⣿⠿⠟⠁⠸⠿⠿⠿⠿⠿⠿⠟⠋  ⠈⠛⠿⢿⣿⠿⠟⠁   ⠻⠿⠃     ",
+						}, "\n"),
+						hl = "SnacksDashboardHeader",
+						align = "center"
+					},
+					gap = 0,
+					padding = 0
+				},
+				{
+					text = {
+						"by kboshold",
+						hl = "SnacksDashboardAuthor",
+						align = "center"
+					},
+					gap = 0,
+					padding = {3,0}
+				},
+				{ section = "keys", gap = 1, padding = 3 },
+				{ section = "startup", padding = 3 },
 			},
 		},
 	},
