@@ -63,7 +63,7 @@ return {
         return
       end
 
-      require("snacks").explorer.open()
+      Snacks.explorer({ focus = false })
     end
 
     -- only  open neotree if size is > 158
@@ -76,7 +76,7 @@ return {
     local explorer_size = 158
     local function on_resized()
       if old_size < explorer_size and vim.o.columns >= explorer_size then
-        Snacks.explorer()
+        Snacks.explorer({ focus = false })
       end
 
       if old_size >= explorer_size and vim.o.columns < explorer_size then
