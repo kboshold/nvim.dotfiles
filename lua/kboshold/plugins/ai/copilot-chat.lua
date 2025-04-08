@@ -49,6 +49,34 @@ local base = string.format(
   vim.uv.os_uname().sysname
 )
 
+local commit = [[
+Write a commitizen-style commit message for my changes. Please create only the code block without further explanations.
+
+**Requirements:**
+
+- Title: under 50 characters
+- Body: wrap at 72 characters
+- Include essential information only
+- Format as `gitcommit` code block
+- Prepend a header with the lines to replace. It should only replace the lines in font of the first comment.
+- End with a newline followed by 52 hyphens as a comment starting with `#`.
+- The scope is always the ticket id. The ticket is in the branch name like `feature/<ticket>` or `bugfix/<ticket>`. 
+- Skip the scope for the main and develop branch
+
+**Example format:**
+
+[file:.git/COMMIT_EDITMSG](.git/COMMIT_EDITMSG) line:1-1
+
+```gitcommit
+feat(#123): add login functionality
+
+Implement user authentication flow with proper validation
+and error handling. Connects to the auth API endpoint.
+
+# --------------------------------------------------
+```
+]]
+
 return {
   "CopilotC-Nvim/CopilotChat.nvim",
   dependencies = {
@@ -80,6 +108,15 @@ return {
         CUSTOM = {
           system_prompt = base,
         },
+        CommitMessage = {
+          system_prompt = base,
+          prompt = commit,
+          context = {
+            "$gpt-4o",
+            "git:staged",
+            "#file:`.git/COMMIT_EDITMSG`",
+          },
+        },
       },
     }
   end,
@@ -98,6 +135,81 @@ return {
     })
 
     chat.setup(opts)
+  end,
+
+  init = function()
+    local function on_gitcommit_bufenter()
+      local buf = vim.api.nvim_get_current_buf()
+
+      local first_line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+      if not (first_line == "" or first_line == nil) then
+        return
+      end
+
+      local spinner_frames = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
+      local spinner_index = 1
+
+      local msg = " Generating commit message"
+      local ns_id = vim.api.nvim_create_namespace("commit_spinner_namespace")
+      local line = 0 -- Display the spinner on the first line of the buffer
+
+      -- Timer to update the spinner
+      local timer = vim.loop.new_timer()
+      if not timer then
+        vim.notify("Could not create timer", "error", { title = "Commit Message Failed" })
+        return
+      end
+
+      -- Function to update the virtual text
+      local function update_spinner()
+        if not vim.api.nvim_buf_is_valid(buf) then
+          timer:stop()
+          return
+        end
+
+        -- Update virtual text with the current spinner frame
+        vim.api.nvim_buf_clear_namespace(buf, ns_id, 0, -1) -- Clear previous virtual text
+        vim.api.nvim_buf_set_extmark(buf, ns_id, line, 0, {
+          virt_text = { { spinner_frames[spinner_index] .. msg, "CopilotChatStatus" } },
+          virt_text_pos = "overlay",
+        })
+
+        -- Update spinner frame
+        spinner_index = (spinner_index % #spinner_frames) + 1
+      end
+
+      -- Start the spinner
+      vim.api.nvim_buf_set_lines(buf, 0, 0, false, { "" })
+      timer:start(0, 100, vim.schedule_wrap(update_spinner))
+
+      -- Setup CopilotChat to generate the commit message
+      local chat = require("CopilotChat")
+      local prompts = chat.prompts()
+      local prompt = prompts["CommitMessage"]
+      local config = vim.tbl_extend("force", prompt, {
+        headless = true,
+        callback = function(response)
+          timer:stop()
+
+          -- Clear the spinner after generating the commit message
+          vim.api.nvim_buf_clear_namespace(buf, ns_id, 0, -1)
+
+          local commit_message = string.match(response, "```[`]?.-\n(.-)\n```[`]?")
+          if commit_message then
+            local lines = vim.split(commit_message, "\n")
+            vim.api.nvim_buf_set_lines(buf, 0, 1, false, lines)
+          else
+            vim.notify("Could not create a commit message for you.", "error", { title = "Commit Message Failed" })
+          end
+        end,
+      })
+
+      chat.ask(prompt.prompt, config)
+    end
+    vim.api.nvim_create_autocmd({ "BufEnter" }, {
+      pattern = "COMMIT_EDITMSG",
+      callback = on_gitcommit_bufenter,
+    })
   end,
 
   keys = {
