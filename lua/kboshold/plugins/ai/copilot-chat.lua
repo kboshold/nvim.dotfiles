@@ -59,9 +59,14 @@ Write a commitizen-style commit message for my changes. Please create only the c
 - Include essential information only
 - Format as `gitcommit` code block
 - Prepend a header with the lines to replace. It should only replace the lines in font of the first comment.
-- End with a newline followed by 52 hyphens as a comment starting with `#`.
 - The scope is always the ticket id. The ticket is in the branch name like `feature/<ticket>` or `bugfix/<ticket>`. 
 - Skip the scope for the main and develop branch
+- End the commit body with a newline followed by 52 hyphens as a comment starting with `#`.
+- Add some usefull comments about the code after the ruler as a comment
+-- Is debbuging output in the newly added code. If so, add the files and line number or write `None`.
+-- Possible errors introduced by the newly created code
+-- Possible optimizations that should be added to the new code
+-- It is not allowed to have any multiline code in this comment. Always refer to files and their line number.
 
 **Example format:**
 
@@ -74,6 +79,17 @@ Implement user authentication flow with proper validation
 and error handling. Connects to the auth API endpoint.
 
 # --------------------------------------------------
+# Debugging Output:
+# - [main.js:34](./src/main.js:34): Usage of `debugger` statement.
+# - [compiler.js:528](./src/compiler.js:528): Usage of `console.log`.
+#
+# Possible Issues:
+# - [main.js:45](./src/main.js:45): Missing check for `null`.
+#
+# Possible Optimizations: 
+# - [main.js:156](./src/main.js:156): Use `let` instead of `var`
+# - [main.js:195](./src/main.js:195): Optimize the data structure to improve performance
+#
 ```
 ]]
 
