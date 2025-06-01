@@ -54,13 +54,12 @@ Write a commitizen-style commit message for my changes. Please create only the c
 
 **Requirements:**
 
-- Title: under 50 characters
+- Title: under 50 characters and talk imperative. Follow this rule: If applied, this commit will <commit message>
 - Body: wrap at 72 characters
 - Include essential information only
 - Format as `gitcommit` code block
 - Prepend a header with the lines to replace. It should only replace the lines in font of the first comment.
-- The scope is always the ticket id. The ticket is in the branch name like `feature/<ticket>` or `bugfix/<ticket>`. 
-- Skip the scope for the main and develop branch
+- Use `{scope}` as the scope. If the scope is empty then skip it.
 - End the commit body with a newline followed by 52 hyphens as a comment starting with `#`.
 - Add some usefull comments about the code after the ruler as a comment
 -- Is debbuging output in the newly added code. If so, add the files and line number or write `None`.
@@ -68,12 +67,12 @@ Write a commitizen-style commit message for my changes. Please create only the c
 -- Possible optimizations that should be added to the new code
 -- It is not allowed to have any multiline code in this comment. Always refer to files and their line number.
 
-**Example format:**
+**Example format (Branch is `fix/2731-my-tests`):**
 
 [file:.git/COMMIT_EDITMSG](.git/COMMIT_EDITMSG) line:1-1
 
 ```gitcommit
-feat(#123): add login functionality
+feat(#2731): add login functionality
 
 Implement user authentication flow with proper validation
 and error handling. Connects to the auth API endpoint.
@@ -202,6 +201,28 @@ return {
       local chat = require("CopilotChat")
       local prompts = chat.prompts()
       local prompt = prompts["CommitMessage"]
+      local branch = vim.fn.system("git rev-parse --abbrev-ref HEAD"):gsub("%s+", "")
+      local scope = ""
+      if branch ~= "main" and branch ~= "develop" then
+        scope = branch:match("^[^/]+/(.+)")
+        
+        if scope and scope:match("%-") then
+          local ticket_num = scope:match("^(%d+)%-")
+          if ticket_num then
+            scope = ticket_num
+          else
+            local jira_ticket = scope:match("^([A-Z]+%-[0-9]+)%-?")
+            if jira_ticket then
+              scope = jira_ticket
+            else
+              scope = scope:match("^([^-]+)")
+            end
+          end
+        end
+      end
+
+      prompt.prompt = prompt.prompt:gsub("{scope}", scope)
+
       local config = vim.tbl_extend("force", prompt, {
         headless = true,
         callback = function(response)
