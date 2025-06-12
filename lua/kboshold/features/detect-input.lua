@@ -136,12 +136,12 @@ end
 
 -- Set up detection autocommand
 function M.setup()
-  vim.api.nvim_create_autocmd("BufReadPost", {
-    group = vim.api.nvim_create_augroup("DetectIndent", { clear = true }),
-    callback = function(args)
-      M.detect_indent(args.buf)
-    end,
-  })
+  -- vim.api.nvim_create_autocmd("BufReadPost", {
+  --   group = vim.api.nvim_create_augroup("DetectIndent", { clear = true }),
+  --   callback = function(args)
+  --     M.detect_indent(args.buf)
+  --   end,
+  -- })
 
   return M
 end
