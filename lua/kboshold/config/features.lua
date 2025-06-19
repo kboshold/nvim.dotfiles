@@ -1,3 +1,1 @@
-require("kboshold.features.detect-input").setup({
-  test = "",
-})
+-- require("kboshold.features.detect-input").setup()
