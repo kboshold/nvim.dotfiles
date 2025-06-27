@@ -9,23 +9,32 @@ return {
       typescriptreact = { "eslint_d", "eslint", lsp_format = "fallack" },
       prisma = { "prisma", lsp_format = "fallback" },
       json = { "jsonsort", lsp_format = "first" },
+      nix = { "alejandra", lsp_format = "fallback" },
+      lua = { "alejandra", lsp_format = "fallback" },
     },
     formatters = {
       eslint = {
-        -- command = function()
-        --   local root = require("conform.util").root_file({ "package.json" })
-        --   if root then
-        --     return root .. "/node_modules/.bin/eslint"
-        --   end
-        --   return "eslint" -- Fallback to global eslint if not found
-        -- end,
-        command = "./node_modules/.bin/eslint",
-        args = { "--fix", "--stdin", "--stdin-filename", "$FILENAME" },
+        command = function(self, ctx)
+          local root = vim.fs.root(ctx.dirname, { "package.json" })
+          if root then
+            return vim.fs.joinpath(root, "node_modules/.bin/eslint")
+          end
+          return "eslint" -- Fallback to global eslint if not found
+        end,
+        -- command = "./node_modules/.bin/eslint",
+        args = { "--fix", "$FILENAME" },
         stdin = true,
         cwd = require("conform.util").root_file({ "package.json" }),
       },
       prisma = {
-        command = "./node_modules/.bin/prisma",
+        command = function(self, ctx)
+          local root = vim.fs.root(ctx.dirname, { "package.json" })
+          if root then
+            return vim.fs.joinpath(root, "node_modules/.bin/prisma")
+          end
+          return "prisma" -- Fallback to global eslint if not found
+        end,
+        -- command = "./node_modules/.bin/prisma",
         args = { "format", "--schema", "$FILENAME" },
         stdin = false,
         cwd = require("conform.util").root_file({ "package.json" }),
