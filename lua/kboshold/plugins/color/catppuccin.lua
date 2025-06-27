@@ -84,6 +84,12 @@ return {
 
         SnacksPickerBorder = { fg = colors.lavender, bg = colors.mantle },
         SnacksPickerTree = { fg = colors.surface0 },
+
+        SmartCommitStatus = { fg = colors.sapphire },
+        SmartCommitStatusPending = { fg = colors.peach },
+        SmartCommitStatusSuccess = { fg = colors.green },
+        SmartCommitStatusError = { fg = colors.red },
+        SmartCommitDivider = { fg = colors.overlay1 },
       }
 
       for _, accent in ipairs(accents) do
