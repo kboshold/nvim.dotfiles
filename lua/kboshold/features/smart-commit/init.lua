@@ -5,29 +5,25 @@
 local ui = require("kboshold.features.smart-commit.ui")
 local types = require("kboshold.features.smart-commit.types")
 local runner = require("kboshold.features.smart-commit.runner")
+local config_loader = require("kboshold.features.smart-commit.config")
 
 ---@class SmartCommit
 local M = {}
 
 -- Default configuration
 ---@type SmartCommitConfig
-M.config = {
-  defaults = {
-    auto_run = true,
-    sign_column = true,
-    status_window = {
-      enabled = true,
-      position = "bottom",
-      refresh_rate = 100,
-    },
-  },
-  tasks = {},
-}
+M.config = config_loader.defaults
 
 -- Setup function to initialize the plugin with user config
 ---@param opts SmartCommitConfig|nil User configuration table
 function M.setup(opts)
-  -- Merge user config with defaults
+  -- Load configuration from files
+  local file_config = config_loader.load_config()
+  
+  -- Start with defaults, then apply file config, then apply setup opts
+  M.config = vim.tbl_deep_extend("force", M.config, file_config)
+  
+  -- Merge user config from setup() if provided
   if opts then
     M.config = vim.tbl_deep_extend("force", M.config, opts)
   end
@@ -82,32 +78,12 @@ function M.on_commit_buffer_open()
   -- Show a notification
   vim.notify("Smart Commit activated: Git commit buffer detected", vim.log.levels.INFO)
   
-  -- Run multiple tasks for demonstration
-  -- Two successful tasks
-  runner.run_task(win_id, {
-    id = "lint-check",
-    label = "Lint Check",
-    command = "sleep 2 && exit 0", -- Will succeed after 2 seconds
-  })
-  
-  runner.run_task(win_id, {
-    id = "type-check",
-    label = "Type Check",
-    command = "sleep 3 && exit 0", -- Will succeed after 3 seconds
-  })
-  
-  -- Two failed tasks
-  runner.run_task(win_id, {
-    id = "test-run",
-    label = "Test Run",
-    command = "sleep 4 && exit 1", -- Will fail after 4 seconds
-  })
-  
-  runner.run_task(win_id, {
-    id = "build-check",
-    label = "Build Check",
-    command = "sleep 5 && exit 1", -- Will fail after 5 seconds
-  })
+  -- Run tasks from configuration
+  for id, task_config in pairs(M.config.tasks) do
+    if task_config then  -- Skip tasks that are set to false
+      runner.run_task(win_id, task_config)
+    end
+  end
 end
 
 -- Enable the plugin

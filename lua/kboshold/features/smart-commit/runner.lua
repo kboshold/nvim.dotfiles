@@ -109,7 +109,7 @@ function M.start_ui_updates(win_id)
   end
   
   update_timer = vim.loop.new_timer()
-  update_timer:start(0, 200, function()  -- Changed to 200ms for a medium speed
+  update_timer:start(0, 100, function()  -- Changed to 100ms for faster animation
     vim.schedule(function()
       if vim.api.nvim_win_is_valid(win_id) then
         -- Advance the spinner frame once per update cycle
@@ -177,7 +177,8 @@ function M.update_signs(win_id)
   end
   
   -- Force a redraw to update the sign column immediately
-  vim.cmd("redraw")
+  vim.cmd("redrawstatus")
+  vim.cmd("redraw!")
 end
 
 -- Update the UI with current task states
