@@ -391,6 +391,19 @@ function M.update_ui(win_id, tasks, config)
   -- Add task status lines
   local task_count = #task_keys
   local visible_tasks = 0
+  local total_visible_tasks = 0
+  
+  -- First count how many tasks will be visible
+  if config and config.defaults and config.defaults.hide_skipped then
+    for _, id in ipairs(task_keys) do
+      local task_state = M.tasks[id]
+      if task_state.state ~= M.TASK_STATE.SKIPPED then
+        total_visible_tasks = total_visible_tasks + 1
+      end
+    end
+  else
+    total_visible_tasks = task_count
+  end
   
   for i, id in ipairs(task_keys) do
     local task_state = M.tasks[id]
@@ -408,7 +421,7 @@ function M.update_ui(win_id, tasks, config)
     local task_icon = task_config and task_config.icon or ""
     
     -- Use bottom border for the last visible task
-    if visible_tasks == task_count or i == #task_keys then
+    if visible_tasks == total_visible_tasks then
       border_char = utils.BORDERS.BOTTOM
     end
     
