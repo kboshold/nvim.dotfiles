@@ -19,7 +19,7 @@ return {
       label = "Generate Commit Message",
       icon = "󰚩",
     },
-    
+
     -- Analyze staged changes for potential issues
     ["analyze-code"] = {
       extend = "analyze-staged",
@@ -27,7 +27,7 @@ return {
       label = "Analyze Code",
       icon = "󰌵",
     },
-    
+
     -- Extend the base PNPM task for lint
     ["pnpm-lint"] = {
       extend = "pnpm",
@@ -36,7 +36,7 @@ return {
       icon = "",
       script = "lint",
     },
-    
+
     -- Extend the base PNPM task for typecheck
     ["pnpm-typecheck"] = {
       extend = "pnpm",

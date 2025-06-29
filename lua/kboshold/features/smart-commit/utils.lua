@@ -15,7 +15,7 @@ M.spinner_frames = {
   "⠦",
   "⠧",
   "⠇",
-  "⠏"
+  "⠏",
 }
 M.current_spinner_idx = 1
 
@@ -34,10 +34,10 @@ end
 -- Define sign icons
 M.ICONS = {
   RUNNING = "󱑢", -- Spinner icon
-  SUCCESS = "✓",  -- Check mark
-  ERROR = "✗",    -- X mark
-  WARNING = "⚠",  -- Warning
-  INFO = "ℹ",     -- Info
+  SUCCESS = "✓", -- Check mark
+  ERROR = "✗", -- X mark
+  WARNING = "⚠", -- Warning
+  INFO = "ℹ", -- Info
 }
 
 -- Border icons for UI
