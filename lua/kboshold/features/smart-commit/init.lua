@@ -81,6 +81,17 @@ end
 function M.on_commit_buffer_open(bufnr)
   local win_id = vim.fn.bufwinid(bufnr)
   
+  -- Debug: Print the loaded tasks
+  local task_count = 0
+  local task_ids = {}
+  for id, task in pairs(M.config.tasks) do
+    if task then
+      task_count = task_count + 1
+      table.insert(task_ids, id)
+    end
+  end
+  vim.notify("Loaded " .. task_count .. " tasks: " .. table.concat(task_ids, ", "), vim.log.levels.WARN)
+  
   -- Show initial header
   ---@type StickyHeaderContent
   local content = {

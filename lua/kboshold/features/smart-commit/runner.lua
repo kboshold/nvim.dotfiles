@@ -76,7 +76,8 @@ function M.run_task(win_id, task, all_tasks, config)
       win_id = win_id,
       buf_id = buf_id,
       runner = M,
-      task = task
+      task = task,
+      config = config
     }
     
     -- Run the handler
@@ -88,7 +89,7 @@ function M.run_task(win_id, task, all_tasks, config)
       M.tasks[task.id].state = result and M.TASK_STATE.SUCCESS or M.TASK_STATE.FAILED
       M.tasks[task.id].end_time = vim.loop.now()
       vim.schedule(function()
-        M.update_ui(win_id, all_tasks)
+        M.update_ui(win_id, all_tasks, config)
         M.update_signs(win_id)
       end)
     elseif type(result) == "string" then
@@ -98,7 +99,7 @@ function M.run_task(win_id, task, all_tasks, config)
       -- Nil result means the handler is managing the task state asynchronously
       -- We'll just update the UI to show the running state
       vim.schedule(function()
-        M.update_ui(win_id, all_tasks)
+        M.update_ui(win_id, all_tasks, config)
         M.update_signs(win_id)
       end)
     end
@@ -484,6 +485,17 @@ end
 function M.run_tasks_with_dependencies(win_id, tasks, config)
   -- Set the process start time
   M.process_start_time = vim.loop.now()
+  
+  -- Debug: Print the tasks that will be run
+  local task_count = 0
+  local task_ids = {}
+  for id, task in pairs(tasks) do
+    if task then
+      task_count = task_count + 1
+      table.insert(task_ids, id)
+    end
+  end
+  vim.notify("Running " .. task_count .. " tasks: " .. table.concat(task_ids, ", "), vim.log.levels.WARN)
   
   -- Initialize all tasks as pending
   for id, task in pairs(tasks) do

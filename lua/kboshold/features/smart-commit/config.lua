@@ -27,6 +27,16 @@ M.defaults = {
 ---@param filename string The filename to search for
 ---@return string|nil The path to the file if found, nil otherwise
 local function find_file_upwards(filename)
+  -- First, try to find the file in the Git repository root
+  local git_root = vim.fn.system("git rev-parse --show-toplevel 2>/dev/null"):gsub("\n", "")
+  if vim.v.shell_error == 0 and git_root ~= "" then
+    local git_root_path = git_root .. "/" .. filename
+    if vim.fn.filereadable(git_root_path) == 1 then
+      return git_root_path
+    end
+  end
+  
+  -- If not found in Git root, try traversing up from the current directory
   local current_dir = vim.fn.getcwd()
   local path = current_dir .. "/" .. filename
   
@@ -81,9 +91,9 @@ local function process_tasks(tasks)
       if predefined_id and predefined.get(predefined_id) then
         -- Create a task that extends the predefined task
         local base_task = vim.deepcopy(predefined.get(predefined_id))
-        -- Generate a local ID by replacing colons with hyphens
-        local local_id = predefined_id:gsub(":", "-")
-        result[local_id] = base_task
+        -- Use the original ID to avoid duplicates
+        result[id] = base_task
+        vim.notify("Added predefined task: " .. id, vim.log.levels.WARN)
       else
         vim.notify("Unknown predefined task: " .. id, vim.log.levels.WARN)
       end
@@ -161,6 +171,7 @@ function M.load_config()
   if user_config then
     -- Process tasks before merging
     if user_config.tasks then
+      vim.notify("Processing user config tasks: " .. vim.inspect(vim.tbl_keys(user_config.tasks)), vim.log.levels.WARN)
       user_config.tasks = process_tasks(user_config.tasks)
     end
     config = vim.tbl_deep_extend("force", config, user_config)
@@ -169,14 +180,23 @@ function M.load_config()
   -- 2. Load project-specific config from .smart-commit.lua in the project
   local project_config_path = find_file_upwards(".smart-commit.lua")
   if project_config_path then
+    vim.notify("Found project config at: " .. project_config_path, vim.log.levels.WARN)
     local project_config = load_lua_file(project_config_path)
     if project_config then
       -- Process tasks before merging
       if project_config.tasks then
+        vim.notify("Processing project config tasks: " .. vim.inspect(vim.tbl_keys(project_config.tasks)), vim.log.levels.WARN)
         project_config.tasks = process_tasks(project_config.tasks)
       end
       config = vim.tbl_deep_extend("force", config, project_config)
     end
+  else
+    vim.notify("No project config found", vim.log.levels.WARN)
+  end
+  
+  -- Check if we have any tasks
+  if vim.tbl_isempty(config.tasks) then
+    vim.notify("No tasks found in configuration", vim.log.levels.ERROR)
   end
   
   return config

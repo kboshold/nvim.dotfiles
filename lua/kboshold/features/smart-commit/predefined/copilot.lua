@@ -61,7 +61,7 @@ end
 M.analyze_staged = {
   id = "copilot:analyze",
   label = "Analyze Staged Changes",
-  icon = "󰌵",
+  icon = "󰟌",
   handler = function(ctx)
     -- Check if CopilotChat is available
     if not pcall(require, "CopilotChat") then
@@ -70,7 +70,7 @@ M.analyze_staged = {
     end
 
     local CopilotChat = require("CopilotChat")
-    
+
     -- Get staged changes
     local staged_changes = get_staged_changes()
     if staged_changes == "" then
@@ -82,7 +82,7 @@ M.analyze_staged = {
       ctx.runner.update_signs(ctx.win_id)
       return nil
     end
-    
+
     -- Construct the prompt for Copilot
     local prompt = [[
 Analyze the staged code changes and provide a concise summary of:
@@ -100,15 +100,31 @@ If there are no issues in a category, simply state "No issues found".
     -- Use headless mode with callback
     CopilotChat.ask(prompt, {
       headless = true,
+      model = "gpt-4.1",
       context = {
         "git:staged",
       },
       callback = function(response)
         if not response or response == "" then
           vim.notify("Failed to analyze staged changes", vim.log.levels.ERROR)
+
+          -- Update task status to failed
+          vim.schedule(function()
+            ctx.runner.tasks[ctx.task.id].state = ctx.runner.TASK_STATE.FAILED
+            ctx.runner.tasks[ctx.task.id].end_time = vim.loop.now()
+            ctx.runner.update_ui(ctx.win_id)
+            ctx.runner.update_signs(ctx.win_id)
+          end)
+          return
+        end
+        
+        -- Check for quota exceeded message
+        if response:match("[Qq]uota exceeded") or response:match("[Qq]uota extended") then
+          vim.notify("Copilot quota exceeded", vim.log.levels.ERROR)
           
           -- Update task status to failed
           vim.schedule(function()
+            ctx.runner.tasks[ctx.task.id].output = "Copilot quota exceeded"
             ctx.runner.tasks[ctx.task.id].state = ctx.runner.TASK_STATE.FAILED
             ctx.runner.tasks[ctx.task.id].end_time = vim.loop.now()
             ctx.runner.update_ui(ctx.win_id)
@@ -119,7 +135,7 @@ If there are no issues in a category, simply state "No issues found".
 
         -- Store the analysis in the task output
         ctx.runner.tasks[ctx.task.id].output = response
-        
+
         -- Create a floating window to display the analysis
         vim.schedule(function()
           -- Update task status to success
@@ -127,7 +143,7 @@ If there are no issues in a category, simply state "No issues found".
           ctx.runner.tasks[ctx.task.id].end_time = vim.loop.now()
           ctx.runner.update_ui(ctx.win_id)
           ctx.runner.update_signs(ctx.win_id)
-          
+
           -- Use the UI module to show the analysis in a floating window on the right
           local ui = require("kboshold.features.smart-commit.ui")
           ui.show_analysis(ctx.win_id, "Code Analysis Results", response)
@@ -145,7 +161,7 @@ If there are no issues in a category, simply state "No issues found".
 M.generate_commit_message = {
   id = "copilot:message",
   label = "Generate Commit Message",
-  icon = "",
+  icon = "",
   handler = function(ctx)
     -- Get commit scope from branch name
     local scope = get_commit_scope()
@@ -186,6 +202,7 @@ Only create the commit message. Do not explain anything!
     -- Use headless mode with callback
     CopilotChat.ask(prompt, {
       headless = true,
+      model = "gpt-4.1",
       context = {
         "git:staged",
         "file:`.git/COMMIT_EDITMSG`",
@@ -199,6 +216,21 @@ Only create the commit message. Do not explain anything!
             ctx.runner.tasks[ctx.task.id].state = ctx.runner.TASK_STATE.FAILED
             ctx.runner.tasks[ctx.task.id].end_time = vim.loop.now()
             ctx.runner.update_ui(ctx.win_id)
+            ctx.runner.update_signs(ctx.win_id)
+          end)
+          return
+        end
+        
+        -- Check for quota exceeded message
+        if response:match("[Qq]uota exceeded") or response:match("[Qq]uota extended") then
+          vim.notify("Copilot quota exceeded", vim.log.levels.ERROR)
+          
+          -- Update task status to failed
+          vim.schedule(function()
+            ctx.runner.tasks[ctx.task.id].output = "Copilot quota exceeded"
+            ctx.runner.tasks[ctx.task.id].state = ctx.runner.TASK_STATE.FAILED
+            ctx.runner.tasks[ctx.task.id].end_time = vim.loop.now()
+            ctx.runner.update_ui(ctx.win_id, nil, ctx.config)
             ctx.runner.update_signs(ctx.win_id)
           end)
           return
@@ -256,11 +288,11 @@ Only create the commit message. Do not explain anything!
 
           -- Update the buffer with the combined content
           vim.api.nvim_buf_set_lines(ctx.buf_id, 0, -1, false, message_lines)
-          
+
           -- Update task status to success
           ctx.runner.tasks[ctx.task.id].state = ctx.runner.TASK_STATE.SUCCESS
           ctx.runner.tasks[ctx.task.id].end_time = vim.loop.now()
-          ctx.runner.update_ui(ctx.win_id)
+          ctx.runner.update_ui(ctx.win_id, nil, ctx.config)
           ctx.runner.update_signs(ctx.win_id)
         end)
       end,

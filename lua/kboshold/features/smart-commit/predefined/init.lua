@@ -24,7 +24,7 @@ M.tasks = {
 function M.get(id)
   local task = M.tasks[id]
   if not task then
-    vim.notify("Predefined task not found: " .. id, vim.log.levels.ERROR)
+    vim.notify("Predefined task not found: " .. id, vim.log.levels.WARN)
   end
 
   return task
