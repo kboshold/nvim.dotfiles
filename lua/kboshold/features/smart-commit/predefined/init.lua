@@ -21,10 +21,9 @@ M.tasks = {
 ---@param id string The task ID
 ---@return SmartCommitTask|nil The task or nil if not found
 function M.get(id)
-  -- No debug logging in normal mode
   local task = M.tasks[id]
   if not task then
-    vim.notify("Predefined task not found: " .. id, vim.log.levels.WARN)
+    vim.notify("Predefined task not found: " .. id, vim.log.levels.ERROR)
   end
 
   return task

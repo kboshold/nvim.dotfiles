@@ -99,9 +99,12 @@ local function process_tasks(tasks)
         merged_task.extend = nil
         result[id] = merged_task
       else
-        vim.notify("Task '" .. id .. "' extends unknown task '" .. task.extend .. "'", vim.log.levels.WARN)
-        -- Still include the task, just without extension
-        result[id] = vim.deepcopy(task)
+        -- Error: Task extends an unknown task
+        local error_msg = "Task '" .. id .. "' extends unknown task '" .. task.extend .. "'"
+        vim.notify(error_msg, vim.log.levels.ERROR)
+        
+        -- Set the task to false to disable it
+        result[id] = false
       end
     end
   end

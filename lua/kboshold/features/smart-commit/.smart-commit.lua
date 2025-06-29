@@ -42,7 +42,7 @@ return {
     
     -- Copilot message task
     ["copilot-message"] = {
-      extend = "generate-commit-message",
+      extend = "copilot:message",
       label = "Generate Commit Message with Copilot",
       icon = "󰚩",
     },
