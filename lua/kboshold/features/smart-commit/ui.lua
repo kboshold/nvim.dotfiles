@@ -8,6 +8,113 @@ local M = {}
 ---@type table<number, StickyHeaderState>
 local header_states = {}
 
+-- Internal state tracking for analysis windows
+---@type table<number, {win_id: number, buf_id: number, is_visible: boolean}>
+local analysis_windows = {}
+
+--- Creates a floating window for analysis results on the right side of the commit buffer
+---@param target_win_id number The window ID of the commit buffer
+---@param title string The title for the analysis window
+---@param content string The content to display in the analysis window
+---@return number|nil The window ID of the created floating window, or nil if creation failed
+function M.show_analysis(target_win_id, title, content)
+  -- Check if the target window is valid
+  if not vim.api.nvim_win_is_valid(target_win_id) then
+    return nil
+  end
+  
+  -- Close existing analysis window if it exists
+  if analysis_windows[target_win_id] and analysis_windows[target_win_id].is_visible then
+    if vim.api.nvim_win_is_valid(analysis_windows[target_win_id].win_id) then
+      vim.api.nvim_win_close(analysis_windows[target_win_id].win_id, true)
+    end
+  end
+  
+  -- Get target window position and size
+  local win_pos = vim.api.nvim_win_get_position(target_win_id)
+  local win_width = vim.api.nvim_win_get_width(target_win_id)
+  local win_height = vim.api.nvim_win_get_height(target_win_id)
+  
+  -- Create a new buffer for the analysis
+  local buf_id = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_option(buf_id, "buftype", "nofile")
+  vim.api.nvim_buf_set_option(buf_id, "bufhidden", "wipe")
+  vim.api.nvim_buf_set_option(buf_id, "swapfile", false)
+  vim.api.nvim_buf_set_option(buf_id, "filetype", "markdown")
+  vim.api.nvim_buf_set_name(buf_id, "SmartCommit-Analysis")
+  
+  -- Set the content
+  local lines = vim.split(content, "\n")
+  vim.api.nvim_buf_set_lines(buf_id, 0, -1, false, lines)
+  
+  -- Calculate dimensions for the floating window
+  local width = math.min(80, vim.o.columns - win_width - 4)
+  local height = math.min(#lines + 2, vim.o.lines - 4)
+  
+  -- Calculate position (right side of target window)
+  local col = win_pos[2] + win_width
+  local row = win_pos[1]
+  
+  -- Create the floating window
+  local opts = {
+    relative = "editor",
+    width = width,
+    height = height,
+    col = col,
+    row = row,
+    anchor = "NW",
+    style = "minimal",
+    border = "rounded",
+    title = " " .. title .. " ",
+    title_pos = "center"
+  }
+  
+  local win_id = vim.api.nvim_open_win(buf_id, false, opts)
+  
+  -- Configure window options
+  vim.api.nvim_win_set_option(win_id, "wrap", true)
+  vim.api.nvim_win_set_option(win_id, "number", false)
+  vim.api.nvim_win_set_option(win_id, "relativenumber", false)
+  vim.api.nvim_win_set_option(win_id, "cursorline", false)
+  vim.api.nvim_win_set_option(win_id, "signcolumn", "no")
+  
+  -- Store the window state
+  analysis_windows[target_win_id] = {
+    win_id = win_id,
+    buf_id = buf_id,
+    is_visible = true
+  }
+  
+  -- Add autocmd to close the analysis window when the target window is closed
+  local augroup = vim.api.nvim_create_augroup("SmartCommitAnalysis", { clear = true })
+  vim.api.nvim_create_autocmd("WinClosed", {
+    group = augroup,
+    pattern = tostring(target_win_id),
+    callback = function()
+      if analysis_windows[target_win_id] and analysis_windows[target_win_id].is_visible then
+        if vim.api.nvim_win_is_valid(analysis_windows[target_win_id].win_id) then
+          vim.api.nvim_win_close(analysis_windows[target_win_id].win_id, true)
+        end
+        analysis_windows[target_win_id].is_visible = false
+      end
+    end,
+    once = true
+  })
+  
+  return win_id
+end
+
+--- Closes the analysis window for a given target window
+---@param target_win_id number The window ID of the commit buffer
+function M.close_analysis(target_win_id)
+  if analysis_windows[target_win_id] and analysis_windows[target_win_id].is_visible then
+    if vim.api.nvim_win_is_valid(analysis_windows[target_win_id].win_id) then
+      vim.api.nvim_win_close(analysis_windows[target_win_id].win_id, true)
+    end
+    analysis_windows[target_win_id].is_visible = false
+  end
+end
+
 -- Setup autocommands for window management
 local function setup_window_autocommands()
   local augroup = vim.api.nvim_create_augroup("SmartCommitUI", { clear = true })

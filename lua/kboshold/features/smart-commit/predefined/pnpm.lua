@@ -49,7 +49,6 @@ local function ensure_dependencies()
   end
   
   -- Always run pnpm install
-  vim.notify("Running pnpm install in background", vim.log.levels.INFO)
   
   -- Check if pnpm is installed
   local pnpm_exists = vim.fn.executable("pnpm") == 1
@@ -75,7 +74,6 @@ local function ensure_dependencies()
   }, function(obj)
     vim.schedule(function()
       if obj.code == 0 then
-        vim.notify("PNPM install completed", vim.log.levels.INFO)
         -- Refresh available scripts after install
         _available_scripts = nil
       else

@@ -133,7 +133,6 @@ function M.load_config()
       user_config.tasks = process_tasks(user_config.tasks)
     end
     config = vim.tbl_deep_extend("force", config, user_config)
-    vim.notify("Loaded user config from " .. user_config_path, vim.log.levels.INFO)
   end
   
   -- 2. Load project-specific config from .smart-commit.lua in the project
@@ -146,7 +145,6 @@ function M.load_config()
         project_config.tasks = process_tasks(project_config.tasks)
       end
       config = vim.tbl_deep_extend("force", config, project_config)
-      vim.notify("Loaded project config from " .. project_config_path, vim.log.levels.INFO)
     end
   end
   

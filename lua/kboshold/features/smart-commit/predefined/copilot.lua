@@ -128,61 +128,9 @@ If there are no issues in a category, simply state "No issues found".
           ctx.runner.update_ui(ctx.win_id)
           ctx.runner.update_signs(ctx.win_id)
           
-          -- Create a floating window with the analysis
-          local buf = vim.api.nvim_create_buf(false, true)
-          vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
-          
-          -- Split the response into lines
-          local lines = {}
-          for line in response:gmatch("[^\r\n]+") do
-            table.insert(lines, line)
-          end
-          
-          -- Set the buffer content
-          vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-          
-          -- Set buffer options
-          vim.api.nvim_buf_set_option(buf, "modifiable", false)
-          vim.api.nvim_buf_set_option(buf, "filetype", "markdown")
-          
-          -- Calculate window size and position
-          local width = math.min(80, vim.o.columns - 4)
-          local height = math.min(#lines + 2, vim.o.lines - 4)
-          local row = math.floor((vim.o.lines - height) / 2)
-          local col = math.floor((vim.o.columns - width) / 2)
-          
-          -- Create the window
-          local win_opts = {
-            relative = "editor",
-            width = width,
-            height = height,
-            row = row,
-            col = col,
-            style = "minimal",
-            border = "rounded",
-            title = " Code Analysis Results ",
-            title_pos = "center",
-          }
-          
-          local win = vim.api.nvim_open_win(buf, true, win_opts)
-          
-          -- Set window options
-          vim.api.nvim_win_set_option(win, "wrap", true)
-          vim.api.nvim_win_set_option(win, "cursorline", true)
-          
-          -- Close window on q, Esc, or Enter
-          local function close_win()
-            if vim.api.nvim_win_is_valid(win) then
-              vim.api.nvim_win_close(win, true)
-            end
-          end
-          
-          vim.keymap.set("n", "q", close_win, { buffer = buf, noremap = true })
-          vim.keymap.set("n", "<Esc>", close_win, { buffer = buf, noremap = true })
-          vim.keymap.set("n", "<CR>", close_win, { buffer = buf, noremap = true })
-          
-          -- Set buffer name
-          vim.api.nvim_buf_set_name(buf, "SmartCommit-Analysis")
+          -- Use the UI module to show the analysis in a floating window on the right
+          local ui = require("kboshold.features.smart-commit.ui")
+          ui.show_analysis(ctx.win_id, "Code Analysis Results", response)
         end)
       end,
     })
@@ -308,8 +256,7 @@ Only create the commit message. Do not explain anything!
 
           -- Update the buffer with the combined content
           vim.api.nvim_buf_set_lines(ctx.buf_id, 0, -1, false, message_lines)
-          vim.notify("Commit message generated", vim.log.levels.INFO)
-
+          
           -- Update task status to success
           ctx.runner.tasks[ctx.task.id].state = ctx.runner.TASK_STATE.SUCCESS
           ctx.runner.tasks[ctx.task.id].end_time = vim.loop.now()

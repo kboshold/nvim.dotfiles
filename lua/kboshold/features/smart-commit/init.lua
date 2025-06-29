@@ -105,14 +105,12 @@ end
 function M.enable()
   M.config.defaults.auto_run = true
   M.create_autocommands()
-  vim.notify("Smart Commit enabled", vim.log.levels.INFO)
 end
 
 -- Disable the plugin
 function M.disable()
   M.config.defaults.auto_run = false
   vim.api.nvim_del_augroup_by_name("SmartCommit")
-  vim.notify("Smart Commit disabled", vim.log.levels.INFO)
 end
 
 -- Toggle the plugin state
