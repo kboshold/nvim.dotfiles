@@ -1,5 +1,6 @@
 return {
-  dir = vim.fn.stdpath("config") .. "/lua/kboshold/features/smart-commit",
+  "kboshold/smart-commit.nvim",
+  -- dir = "/home/kboshold/workspace/config/smart-commit.nvim",
   name = "smart-commit",
   lazy = false,
   dependencies = {
@@ -7,7 +8,7 @@ return {
     "CopilotC-Nvim/CopilotChat.nvim", -- Required for commit message generation
   },
   config = function()
-    require("kboshold.features.smart-commit").setup({
+    require("smart-commit").setup({
       defaults = {
         auto_run = true,
         sign_column = true,
@@ -24,7 +25,7 @@ return {
     {
       "<leader>sc",
       function()
-        require("kboshold.features.smart-commit").toggle()
+        require("smart-commit").toggle()
       end,
       desc = "Toggle Smart Commit",
     },
