@@ -21,6 +21,14 @@ local M = {}
 ---@alias ErrorHandlerFn fun(err: string)
 ---@alias SuccessHandlerFn fun(result: any)
 
+---@class TaskContext
+---@field win_id number # The window ID of the commit buffer
+---@field buf_id number # The buffer ID of the commit buffer
+---@field runner table # Reference to the runner module
+---@field task SmartCommitTask # The task being executed
+
+---@alias TaskHandlerFn fun(ctx: TaskContext):(boolean | string | nil)
+
 ---@class SmartCommitTask
 ---@field id string # Required, unique identifier for the task.
 ---@field label string # Human-readable name for the UI.
@@ -28,6 +36,7 @@ local M = {}
 ---@field icon? string # Icon to display (Nerd Font recommended).
 ---@field command? string | fun():string # Shell command to execute.
 ---@field fn? TaskFn # Lua function to execute. (Alternative to 'command').
+---@field handler? TaskHandlerFn # Advanced handler function with access to context. Takes precedence over command and fn.
 ---@field cwd? string # Working directory for this specific task.
 ---@field when? ConditionFn # Function to determine if the task should run. Must return true for the task to be scheduled.
 ---@field timeout? number # Timeout in milliseconds for this task.

@@ -62,7 +62,65 @@ function M.run_task(win_id, task, all_tasks)
   -- Start UI update timer if not already running
   M.start_ui_updates(win_id, all_tasks)
   
-  -- Determine the command to run
+  -- Get the buffer ID for the commit buffer
+  local buf_id = vim.api.nvim_win_get_buf(win_id)
+  
+  -- Check if task has a handler (highest priority)
+  if task.handler and type(task.handler) == "function" then
+    -- Create context for the handler
+    local ctx = {
+      win_id = win_id,
+      buf_id = buf_id,
+      runner = M,
+      task = task
+    }
+    
+    -- Run the handler
+    local result = task.handler(ctx)
+    
+    -- Process the result
+    if type(result) == "boolean" then
+      -- Boolean result indicates success/failure
+      M.tasks[task.id].state = result and M.TASK_STATE.SUCCESS or M.TASK_STATE.FAILED
+      vim.schedule(function()
+        M.update_ui(win_id, all_tasks)
+        M.update_signs(win_id)
+      end)
+    elseif type(result) == "string" then
+      -- String result is a command to run
+      M.run_command(win_id, buf_id, task, result, all_tasks)
+    else
+      -- Nil result means the handler is managing the task state asynchronously
+      -- We'll just update the UI to show the running state
+      vim.schedule(function()
+        M.update_ui(win_id, all_tasks)
+        M.update_signs(win_id)
+      end)
+    end
+    return
+  end
+  
+  -- Check if task has a function (second priority)
+  if task.fn and type(task.fn) == "function" then
+    local result = task.fn()
+    
+    -- Process the result
+    if type(result) == "boolean" then
+      M.tasks[task.id].state = result and M.TASK_STATE.SUCCESS or M.TASK_STATE.FAILED
+    elseif type(result) == "table" and result.ok ~= nil then
+      M.tasks[task.id].state = result.ok and M.TASK_STATE.SUCCESS or M.TASK_STATE.FAILED
+    else
+      M.tasks[task.id].state = M.TASK_STATE.FAILED
+    end
+    
+    vim.schedule(function()
+      M.update_ui(win_id, all_tasks)
+      M.update_signs(win_id)
+    end)
+    return
+  end
+  
+  -- Determine the command to run (lowest priority)
   local cmd
   if type(task.command) == "function" then
     -- If command is a function, call it with the task as argument
@@ -83,6 +141,17 @@ function M.run_task(win_id, task, all_tasks)
     return
   end
   
+  -- Run the command
+  M.run_command(win_id, buf_id, task, cmd, all_tasks)
+end
+
+-- Run a shell command for a task
+---@param win_id number The window ID of the commit buffer
+---@param buf_id number The buffer ID of the commit buffer
+---@param task SmartCommitTask The task to run
+---@param cmd string The command to run
+---@param all_tasks table<string, SmartCommitTask|false>|nil All tasks configuration
+function M.run_command(win_id, buf_id, task, cmd, all_tasks)
   -- Handle special commands like "exit 0" or "exit 1"
   if cmd == "exit 0" then
     M.tasks[task.id].state = M.TASK_STATE.SUCCESS

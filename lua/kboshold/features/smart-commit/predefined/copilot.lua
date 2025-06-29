@@ -33,7 +33,7 @@ local function get_commit_scope()
   if not branch then
     return nil
   end
-  
+
   local scope = ""
   if branch ~= "main" and branch ~= "develop" then
     scope = branch:match("^[^/]+/(.+)")
@@ -62,26 +62,21 @@ M.generate_commit_message = {
   id = "generate-commit-message",
   label = "Generate Commit Message",
   icon = "󰚩",
-  command = function()
+  handler = function(ctx)
     -- Get commit scope from branch name
     local scope = get_commit_scope()
-    
+
     -- Get staged changes
     local staged_diff = get_staged_changes()
-    
+
     -- Check if CopilotChat is available
     if not pcall(require, "CopilotChat") then
       vim.notify("CopilotChat.nvim is not available", vim.log.levels.ERROR)
-      return "echo 'CopilotChat.nvim is not available'"
+      return false
     end
-    
+
     local CopilotChat = require("CopilotChat")
-    local bufnr = vim.fn.bufnr("COMMIT_EDITMSG")
-    
-    if bufnr == -1 then
-      return "echo 'COMMIT_EDITMSG buffer not found'"
-    end
-    
+
     -- Construct the prompt for Copilot based on the old prompt.lua
     local prompt = [[
 Write a conventional commits style (https://www.conventionalcommits.org/en/v1.0.0/) commit message for my changes. Please create only the code block without further explanations.
@@ -94,12 +89,6 @@ Write a conventional commits style (https://www.conventionalcommits.org/en/v1.0.
 - Format as `gitcommit` code block
 - Prepend a header with the lines to replace. It should only replace the lines in font of the first comment.
 - Use `]] .. (scope or "") .. [[` as the scope. If the scope is empty then skip it. If it includes a `#`, also add it in the scope.
-- End the commit body with a newline followed by 52 hyphens as a comment starting with `#`.
-- Add some usefull comments about the code after the ruler as a comment
--- Is debbuging output in the newly added code. If so, add the files and line number or write `None`.
--- Possible errors introduced by the newly created code
--- Possible optimizations that should be added to the new code
--- It is not allowed to have any multiline code in this comment. Always refer to files and their line number.
 
 Use the following example as reference. Do only use it to understand the format but dont use the information of it.
 
@@ -109,26 +98,11 @@ feat(scope): add login functionality
 Implement user authentication flow with proper validation
 and error handling. Connects to the auth API endpoint.
 
-# --------------------------------------------------
-# Debugging Output:
-# - [main.js:34](./src/main.js:34): Usage of `debugger` statement.
-# - [compiler.js:528](./src/compiler.js:528): Usage of `console.log`.
-#
-# Possible Issues:
-# - [main.js:45](./src/main.js:45): Missing check for `null`.
-#
-# Possible Optimizations:
-# - [main.js:156](./src/main.js:156): Use `let` instead of `var`
-# - [main.js:195](./src/main.js:195): Optimize the data structure to improve performance
-#
 ```
 
 Only create the commit message. Do not explain anything!
 ]]
 
-    -- Create a task to track status
-    local task_completed = false
-    
     -- Use headless mode with callback
     CopilotChat.ask(prompt, {
       headless = true,
@@ -139,21 +113,38 @@ Only create the commit message. Do not explain anything!
       callback = function(response)
         if not response or response == "" then
           vim.notify("Failed to generate commit message", vim.log.levels.ERROR)
-          task_completed = true
+
+          -- Update task status to failed
+          vim.schedule(function()
+            ctx.runner.tasks[ctx.task.id].state = ctx.runner.TASK_STATE.FAILED
+            ctx.runner.update_ui(ctx.win_id)
+            ctx.runner.update_signs(ctx.win_id)
+          end)
           return
         end
-        
+
         -- Extract the gitcommit code block if present
         local commit_message = response:match("```gitcommit\n(.-)\n```")
         if not commit_message then
           -- If no code block found, just clean up markdown formatting
           commit_message = response:gsub("```[%w]*\n", ""):gsub("```", "")
         end
-        
+
         -- Insert the commit message into the buffer
         vim.schedule(function()
+          -- Make sure buffer still exists
+          if not vim.api.nvim_buf_is_valid(ctx.buf_id) then
+            vim.notify("Commit buffer no longer valid", vim.log.levels.ERROR)
+
+            -- Update task status to failed
+            ctx.runner.tasks[ctx.task.id].state = ctx.runner.TASK_STATE.FAILED
+            ctx.runner.update_ui(ctx.win_id)
+            ctx.runner.update_signs(ctx.win_id)
+            return
+          end
+
           -- Clear the buffer first (except for any comments)
-          local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+          local lines = vim.api.nvim_buf_get_lines(ctx.buf_id, 0, -1, false)
           local comment_start_line = 0
           for i, line in ipairs(lines) do
             if line:match("^%s*#") then
@@ -161,27 +152,30 @@ Only create the commit message. Do not explain anything!
               break
             end
           end
-          
+
           if comment_start_line > 0 then
-            vim.api.nvim_buf_set_lines(bufnr, 0, comment_start_line, false, {})
+            vim.api.nvim_buf_set_lines(ctx.buf_id, 0, comment_start_line, false, {})
           end
-          
+
           -- Insert the commit message
           local message_lines = {}
           for line in commit_message:gmatch("[^\r\n]+") do
             table.insert(message_lines, line)
           end
-          
-          vim.api.nvim_buf_set_lines(bufnr, 0, 0, false, message_lines)
-          vim.notify("Commit message generated", vim.log.levels.INFO)
+
+          vim.api.nvim_buf_set_lines(ctx.buf_id, 0, 0, false, message_lines)
+          vim.notify("Commit message generated", vim.log.levels.DEBUG)
+
+          -- Update task status to success
+          ctx.runner.tasks[ctx.task.id].state = ctx.runner.TASK_STATE.SUCCESS
+          ctx.runner.update_ui(ctx.win_id)
+          ctx.runner.update_signs(ctx.win_id)
         end)
-        
-        task_completed = true
-      end
+      end,
     })
-    
-    -- Return a command that will be shown in the UI while waiting for the callback
-    return "echo 'Generating commit message with Copilot...'"
+
+    -- Return nil to indicate that the handler is managing the task state asynchronously
+    return nil
   end,
 }
 
