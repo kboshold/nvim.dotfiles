@@ -56,12 +56,148 @@ local function get_commit_scope()
   return scope
 end
 
+-- Task to analyze staged code changes
+---@type SmartCommitTask
+M.analyze_staged = {
+  id = "copilot:analyze",
+  label = "Analyze Staged Changes",
+  icon = "󰌵",
+  handler = function(ctx)
+    -- Check if CopilotChat is available
+    if not pcall(require, "CopilotChat") then
+      vim.notify("CopilotChat.nvim is not available", vim.log.levels.ERROR)
+      return false
+    end
+
+    local CopilotChat = require("CopilotChat")
+    
+    -- Get staged changes
+    local staged_changes = get_staged_changes()
+    if staged_changes == "" then
+      vim.notify("No staged changes to analyze", vim.log.levels.WARN)
+      ctx.runner.tasks[ctx.task.id].output = "No staged changes to analyze"
+      ctx.runner.tasks[ctx.task.id].state = ctx.runner.TASK_STATE.SKIPPED
+      ctx.runner.tasks[ctx.task.id].end_time = vim.loop.now()
+      ctx.runner.update_ui(ctx.win_id)
+      ctx.runner.update_signs(ctx.win_id)
+      return nil
+    end
+    
+    -- Construct the prompt for Copilot
+    local prompt = [[
+Analyze the staged code changes and provide a concise summary of:
+
+1. Potential issues or bugs (debug statements, commented code, obvious errors)
+2. Security concerns (hardcoded credentials, insecure practices)
+3. Performance considerations
+4. Code quality observations (duplicated code, complex logic)
+
+Format your response as a brief, actionable summary with bullet points for each category.
+Keep your response under 300 words and focus only on significant findings.
+If there are no issues in a category, simply state "No issues found".
+]]
+
+    -- Use headless mode with callback
+    CopilotChat.ask(prompt, {
+      headless = true,
+      context = {
+        "git:staged",
+      },
+      callback = function(response)
+        if not response or response == "" then
+          vim.notify("Failed to analyze staged changes", vim.log.levels.ERROR)
+          
+          -- Update task status to failed
+          vim.schedule(function()
+            ctx.runner.tasks[ctx.task.id].state = ctx.runner.TASK_STATE.FAILED
+            ctx.runner.tasks[ctx.task.id].end_time = vim.loop.now()
+            ctx.runner.update_ui(ctx.win_id)
+            ctx.runner.update_signs(ctx.win_id)
+          end)
+          return
+        end
+
+        -- Store the analysis in the task output
+        ctx.runner.tasks[ctx.task.id].output = response
+        
+        -- Create a floating window to display the analysis
+        vim.schedule(function()
+          -- Update task status to success
+          ctx.runner.tasks[ctx.task.id].state = ctx.runner.TASK_STATE.SUCCESS
+          ctx.runner.tasks[ctx.task.id].end_time = vim.loop.now()
+          ctx.runner.update_ui(ctx.win_id)
+          ctx.runner.update_signs(ctx.win_id)
+          
+          -- Create a floating window with the analysis
+          local buf = vim.api.nvim_create_buf(false, true)
+          vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
+          
+          -- Split the response into lines
+          local lines = {}
+          for line in response:gmatch("[^\r\n]+") do
+            table.insert(lines, line)
+          end
+          
+          -- Set the buffer content
+          vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+          
+          -- Set buffer options
+          vim.api.nvim_buf_set_option(buf, "modifiable", false)
+          vim.api.nvim_buf_set_option(buf, "filetype", "markdown")
+          
+          -- Calculate window size and position
+          local width = math.min(80, vim.o.columns - 4)
+          local height = math.min(#lines + 2, vim.o.lines - 4)
+          local row = math.floor((vim.o.lines - height) / 2)
+          local col = math.floor((vim.o.columns - width) / 2)
+          
+          -- Create the window
+          local win_opts = {
+            relative = "editor",
+            width = width,
+            height = height,
+            row = row,
+            col = col,
+            style = "minimal",
+            border = "rounded",
+            title = " Code Analysis Results ",
+            title_pos = "center",
+          }
+          
+          local win = vim.api.nvim_open_win(buf, true, win_opts)
+          
+          -- Set window options
+          vim.api.nvim_win_set_option(win, "wrap", true)
+          vim.api.nvim_win_set_option(win, "cursorline", true)
+          
+          -- Close window on q, Esc, or Enter
+          local function close_win()
+            if vim.api.nvim_win_is_valid(win) then
+              vim.api.nvim_win_close(win, true)
+            end
+          end
+          
+          vim.keymap.set("n", "q", close_win, { buffer = buf, noremap = true })
+          vim.keymap.set("n", "<Esc>", close_win, { buffer = buf, noremap = true })
+          vim.keymap.set("n", "<CR>", close_win, { buffer = buf, noremap = true })
+          
+          -- Set buffer name
+          vim.api.nvim_buf_set_name(buf, "SmartCommit-Analysis")
+        end)
+      end,
+    })
+
+    -- Return nil to indicate that the handler is managing the task state asynchronously
+    return nil
+  end,
+}
+
 -- Task to generate a commit message
 ---@type SmartCommitTask
 M.generate_commit_message = {
   id = "copilot:message",
   label = "Generate Commit Message",
-  icon = "",
+  icon = "",
   handler = function(ctx)
     -- Get commit scope from branch name
     local scope = get_commit_scope()

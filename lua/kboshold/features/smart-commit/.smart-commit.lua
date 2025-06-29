@@ -46,5 +46,12 @@ return {
       label = "Generate Commit Message with Copilot",
       icon = "󰚩",
     },
+    
+    -- Code analysis task
+    ["analyze-code"] = {
+      extend = "copilot:analyze",
+      label = "Analyze Code Changes",
+      icon = "󰌵",
+    },
   },
 }
