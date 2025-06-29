@@ -38,17 +38,13 @@ local function get_available_scripts()
     scripts[script_name] = true
   end
   
-  vim.notify("Found scripts in package.json: " .. vim.inspect(vim.tbl_keys(scripts)), vim.log.levels.INFO)
   _available_scripts = scripts
   return scripts
 end
 
 -- Run pnpm install if it hasn't been run yet in this session
 local function ensure_dependencies()
-  vim.notify("Checking PNPM dependencies. Already run: " .. tostring(_pnpm_install_run), vim.log.levels.DEBUG)
-  
   if _pnpm_install_run then
-    vim.notify("PNPM install already run this session, skipping", vim.log.levels.DEBUG)
     return true
   end
   
@@ -68,13 +64,7 @@ local function ensure_dependencies()
   
   -- Run pnpm install asynchronously
   vim.system({"pnpm", "install"}, {
-    stdout = function(_, data)
-      if data then
-        vim.schedule(function()
-          vim.notify("pnpm install: " .. data, vim.log.levels.DEBUG)
-        end)
-      end
-    end,
+    stdout = function(_, data) end,
     stderr = function(_, data)
       if data then
         vim.schedule(function()
@@ -85,7 +75,7 @@ local function ensure_dependencies()
   }, function(obj)
     vim.schedule(function()
       if obj.code == 0 then
-        vim.notify("PNPM install completed successfully", vim.log.levels.INFO)
+        vim.notify("PNPM install completed", vim.log.levels.INFO)
         -- Refresh available scripts after install
         _available_scripts = nil
       else
@@ -105,9 +95,6 @@ M.base_task = {
   label = "PNPM Task",
   script = nil, -- To be set by extending tasks
   command = function(self)
-    vim.notify("Executing PNPM task: " .. (self.id or "unknown"), vim.log.levels.DEBUG)
-    vim.notify("Script: " .. (self.script or "not specified"), vim.log.levels.DEBUG)
-    
     -- Ensure dependencies are installed
     if not ensure_dependencies() then
       vim.notify("Failed to ensure dependencies for " .. self.id, vim.log.levels.ERROR)
@@ -122,7 +109,6 @@ M.base_task = {
     
     -- Check if the script exists
     local scripts = get_available_scripts()
-    vim.notify("Available scripts: " .. vim.inspect(scripts), vim.log.levels.DEBUG)
     
     if not scripts[self.script] then
       vim.notify("Script '" .. self.script .. "' not found in package.json", vim.log.levels.WARN)
@@ -131,13 +117,11 @@ M.base_task = {
     
     -- Run the script
     local cmd = "pnpm " .. self.script
-    vim.notify("Running command: " .. cmd, vim.log.levels.INFO)
     return cmd
   end,
   when = function()
     -- Only run if package.json exists
     local has_package = vim.fn.filereadable("package.json") == 1
-    vim.notify("Checking for package.json: " .. tostring(has_package), vim.log.levels.DEBUG)
     return has_package
   end
 }

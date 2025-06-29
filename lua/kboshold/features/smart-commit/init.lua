@@ -97,12 +97,6 @@ function M.on_commit_buffer_open(bufnr)
   -- Show the header
   ui.set(win_id, content)
   
-  -- Show a notification
-  vim.notify("Smart Commit activated: Git commit buffer detected", vim.log.levels.INFO)
-  
-  -- Debug: Show loaded tasks
-  vim.notify("Loaded tasks: " .. vim.inspect(vim.tbl_keys(M.config.tasks)), vim.log.levels.DEBUG)
-  
   -- Run tasks from configuration with dependency tracking
   runner.run_tasks_with_dependencies(win_id, M.config.tasks)
 end

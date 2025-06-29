@@ -46,9 +46,6 @@ setup_signs()
 ---@param task SmartCommitTask The task to run
 ---@param all_tasks table<string, SmartCommitTask|false>|nil All tasks configuration
 function M.run_task(win_id, task, all_tasks)
-  -- Debug task info
-  vim.notify("Running task: " .. task.id, vim.log.levels.DEBUG)
-  
   -- Ensure task has an ID
   if not task.id then
     vim.notify("Task has no ID, skipping", vim.log.levels.ERROR)
@@ -69,11 +66,9 @@ function M.run_task(win_id, task, all_tasks)
   local cmd
   if type(task.command) == "function" then
     -- If command is a function, call it with the task as argument
-    vim.notify("Executing function command for task: " .. task.id, vim.log.levels.DEBUG)
     cmd = task.command(task)
   else
     -- Otherwise use the command string directly
-    vim.notify("Using string command for task: " .. task.id .. ": " .. (task.command or "nil"), vim.log.levels.DEBUG)
     cmd = task.command
   end
   
@@ -374,7 +369,6 @@ function M.run_tasks_with_dependencies(win_id, tasks)
       local should_run = task.when()
       if not should_run then
         M.tasks[id].state = M.TASK_STATE.SKIPPED
-        vim.notify("Task skipped (condition not met): " .. id, vim.log.levels.INFO)
       end
     end
   end
@@ -393,7 +387,6 @@ function M.run_tasks_with_dependencies(win_id, tasks)
   -- Third pass: run tasks without dependencies that aren't skipped
   for id, task in pairs(tasks) do
     if task and not task.depends_on and M.tasks[id].state == M.TASK_STATE.PENDING then
-      vim.notify("Running task without dependencies: " .. id, vim.log.levels.INFO)
       M.run_task(win_id, task, tasks)
     end
   end
@@ -423,7 +416,6 @@ function M.run_tasks_with_dependencies(win_id, tasks)
           
           -- If all dependencies are satisfied, run the task
           if can_run then
-            vim.notify("Dependencies satisfied for task: " .. id, vim.log.levels.INFO)
             M.run_task(win_id, tasks[id], tasks)
             ran_something = true
           end

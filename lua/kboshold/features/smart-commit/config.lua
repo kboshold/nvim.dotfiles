@@ -87,11 +87,9 @@ local function process_tasks(tasks)
       -- Check if it's a predefined task
       if predefined.get(task.extend) then
         base_task = vim.deepcopy(predefined.get(task.extend))
-        vim.notify("Found predefined task to extend: " .. task.extend, vim.log.levels.DEBUG)
       -- Check if it's already in our result set
       elseif result[task.extend] then
         base_task = vim.deepcopy(result[task.extend])
-        vim.notify("Found config task to extend: " .. task.extend, vim.log.levels.DEBUG)
       end
       
       if base_task then
