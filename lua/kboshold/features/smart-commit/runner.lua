@@ -21,6 +21,9 @@ M.TASK_STATE = {
 ---@type table<string, {state: string, output: string, start_time: number}>
 M.tasks = {}
 
+-- Overall process timing
+M.process_start_time = 0
+
 -- Timer for UI updates
 local update_timer = nil
 
@@ -82,6 +85,7 @@ function M.run_task(win_id, task, all_tasks)
     if type(result) == "boolean" then
       -- Boolean result indicates success/failure
       M.tasks[task.id].state = result and M.TASK_STATE.SUCCESS or M.TASK_STATE.FAILED
+      M.tasks[task.id].end_time = vim.loop.now()
       vim.schedule(function()
         M.update_ui(win_id, all_tasks)
         M.update_signs(win_id)
@@ -103,6 +107,9 @@ function M.run_task(win_id, task, all_tasks)
   -- Check if task has a function (second priority)
   if task.fn and type(task.fn) == "function" then
     local result = task.fn()
+    
+    -- Set end time
+    M.tasks[task.id].end_time = vim.loop.now()
     
     -- Process the result
     if type(result) == "boolean" then
@@ -188,7 +195,9 @@ function M.run_command(win_id, buf_id, task, cmd, all_tasks)
       end
     end,
   }, function(obj)
-    -- Update task state based on exit code
+    -- Update task state based on exit code and set end_time
+    M.tasks[task.id].end_time = vim.loop.now()
+    
     if obj.code == 0 then
       M.tasks[task.id].state = M.TASK_STATE.SUCCESS
     else
@@ -327,9 +336,13 @@ function M.update_ui(win_id, tasks)
   
   -- Add status line with spinner if any task is running
   if any_running then
+    -- Calculate elapsed time so far
+    local elapsed_ms = M.process_start_time > 0 and vim.loop.now() - M.process_start_time or 0
+    local elapsed_text = string.format(" (%.2fs)", elapsed_ms / 1000)
+    
     table.insert(content, {
       { text = "Status: ", highlight_group = "Label" },
-      { text = utils.get_current_spinner_frame() .. " Running tasks...", highlight_group = "DiagnosticInfo" },
+      { text = utils.get_current_spinner_frame() .. " Running tasks..." .. elapsed_text, highlight_group = "DiagnosticInfo" },
     })
   else
     -- Check if any task failed
@@ -341,15 +354,19 @@ function M.update_ui(win_id, tasks)
       end
     end
     
+    -- Calculate total elapsed time
+    local elapsed_ms = M.process_start_time > 0 and vim.loop.now() - M.process_start_time or 0
+    local elapsed_text = string.format(" (%.2fs)", elapsed_ms / 1000)
+    
     if any_failed then
       table.insert(content, {
         { text = "Status: ", highlight_group = "Label" },
-        { text = utils.ICONS.ERROR .. " Some tasks failed", highlight_group = "DiagnosticError" },
+        { text = utils.ICONS.ERROR .. " Some tasks failed" .. elapsed_text, highlight_group = "DiagnosticError" },
       })
     else
       table.insert(content, {
         { text = "Status: ", highlight_group = "Label" },
-        { text = utils.ICONS.SUCCESS .. " All tasks completed", highlight_group = "DiagnosticOk" },
+        { text = utils.ICONS.SUCCESS .. " All tasks completed" .. elapsed_text, highlight_group = "DiagnosticOk" },
       })
     end
   end
@@ -383,10 +400,16 @@ function M.update_ui(win_id, tasks)
       status_text = "⏳ Waiting for dependencies..."
       status_hl = "DiagnosticHint"
     elseif task_state.state == M.TASK_STATE.SUCCESS then
-      status_text = utils.ICONS.SUCCESS .. " Success"
+      -- Calculate elapsed time for completed tasks
+      local elapsed_ms = task_state.start_time > 0 and (task_state.end_time or vim.loop.now()) - task_state.start_time or 0
+      local elapsed_text = string.format(" (%.2fs)", elapsed_ms / 1000)
+      status_text = utils.ICONS.SUCCESS .. " Success" .. elapsed_text
       status_hl = "DiagnosticOk"
     elseif task_state.state == M.TASK_STATE.FAILED then
-      status_text = utils.ICONS.ERROR .. " Failed"
+      -- Calculate elapsed time for failed tasks
+      local elapsed_ms = task_state.start_time > 0 and (task_state.end_time or vim.loop.now()) - task_state.start_time or 0
+      local elapsed_text = string.format(" (%.2fs)", elapsed_ms / 1000)
+      status_text = utils.ICONS.ERROR .. " Failed" .. elapsed_text
       status_hl = "DiagnosticError"
     elseif task_state.state == M.TASK_STATE.SKIPPED then
       status_text = " Skipped"
@@ -396,15 +419,22 @@ function M.update_ui(win_id, tasks)
       status_hl = "Comment"
     end
     
-    -- Add icon if provided
-    local display_id = id
+    -- Use task label instead of ID if available
+    local display_text = id
+    local task_config = tasks[id]
+    local task_icon = task_config and task_config.icon or ""
+    local task_label = task_config and task_config.label or id
+    
+    -- Use icon + label if available, otherwise use ID
     if task_icon and task_icon ~= "" then
-      display_id = task_icon .. " " .. id
+      display_text = task_icon .. " " .. task_label
+    else
+      display_text = task_label
     end
     
     table.insert(content, {
       { text = border_char .. " ", highlight_group = "Comment" },
-      { text = display_id .. " ", highlight_group = "Identifier" },
+      { text = display_text .. " ", highlight_group = "Identifier" },
       { text = status_text, highlight_group = status_hl },
     })
   end
@@ -417,6 +447,9 @@ end
 ---@param win_id number The window ID of the commit buffer
 ---@param tasks table<string, SmartCommitTask|false> The tasks to run
 function M.run_tasks_with_dependencies(win_id, tasks)
+  -- Set the process start time
+  M.process_start_time = vim.loop.now()
+  
   -- Initialize all tasks as pending
   for id, task in pairs(tasks) do
     if task then  -- Skip tasks that are set to false

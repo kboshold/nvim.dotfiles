@@ -113,6 +113,7 @@ Only create the commit message. Do not explain anything!
           -- Update task status to failed
           vim.schedule(function()
             ctx.runner.tasks[ctx.task.id].state = ctx.runner.TASK_STATE.FAILED
+            ctx.runner.tasks[ctx.task.id].end_time = vim.loop.now()
             ctx.runner.update_ui(ctx.win_id)
             ctx.runner.update_signs(ctx.win_id)
           end)
@@ -134,6 +135,7 @@ Only create the commit message. Do not explain anything!
 
             -- Update task status to failed
             ctx.runner.tasks[ctx.task.id].state = ctx.runner.TASK_STATE.FAILED
+            ctx.runner.tasks[ctx.task.id].end_time = vim.loop.now()
             ctx.runner.update_ui(ctx.win_id)
             ctx.runner.update_signs(ctx.win_id)
             return
@@ -174,6 +176,7 @@ Only create the commit message. Do not explain anything!
 
           -- Update task status to success
           ctx.runner.tasks[ctx.task.id].state = ctx.runner.TASK_STATE.SUCCESS
+          ctx.runner.tasks[ctx.task.id].end_time = vim.loop.now()
           ctx.runner.update_ui(ctx.win_id)
           ctx.runner.update_signs(ctx.win_id)
         end)
