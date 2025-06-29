@@ -109,7 +109,7 @@ return {
     return {
       auto_insert_mode = true,
       -- chat_autocomplete = false,
-      model = "claude-3.7-sonnet",
+      model = "gpt-4.1",
       question_header = "#   " .. user .. " ",
       answer_header = "#   copilot ",
       error_header = "#  error",
