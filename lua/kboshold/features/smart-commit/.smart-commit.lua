@@ -14,7 +14,6 @@ return {
   tasks = {
     -- PNPM Lint task
     ["pnpm-lint"] = {
-      id = "pnpm-lint",
       label = "PNPM Lint",
       icon = "󰉁",
       extend = "pnpm",
@@ -23,7 +22,6 @@ return {
     
     -- PNPM Prisma Generate task
     ["pnpm-prisma-generate"] = {
-      id = "pnpm-prisma-generate",
       label = "PNPM Prisma Generate",
       icon = "󰆼",
       extend = "pnpm",
@@ -32,7 +30,6 @@ return {
     
     -- PNPM Typecheck task (depends on prisma generate)
     ["pnpm-typecheck"] = {
-      id = "pnpm-typecheck",
       label = "PNPM Typecheck",
       icon = "󰯱",
       extend = "pnpm",

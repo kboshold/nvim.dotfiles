@@ -88,7 +88,15 @@ local function process_tasks(tasks)
       end
     -- Handle regular tasks without 'extend'
     elseif task ~= false and not task.extend then
-      result[id] = vim.deepcopy(task)
+      -- Make a copy of the task
+      local task_copy = vim.deepcopy(task)
+      
+      -- If id is not set, use the key as the id
+      if not task_copy.id then
+        task_copy.id = id
+      end
+      
+      result[id] = task_copy
     end
   end
   
@@ -107,8 +115,16 @@ local function process_tasks(tasks)
       end
       
       if base_task then
+        -- Make a copy of the task
+        local task_copy = vim.deepcopy(task)
+        
+        -- If id is not set, use the key as the id
+        if not task_copy.id then
+          task_copy.id = id
+        end
+        
         -- Merge the task with the base task (task properties override base)
-        local merged_task = vim.tbl_deep_extend("force", base_task, task)
+        local merged_task = vim.tbl_deep_extend("force", base_task, task_copy)
         -- Remove the 'extend' property as it's no longer needed
         merged_task.extend = nil
         result[id] = merged_task
