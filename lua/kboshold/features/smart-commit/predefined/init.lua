@@ -9,27 +9,14 @@ local M = {}
 -- Collection of predefined tasks
 ---@type table<string, SmartCommitTask>
 M.tasks = {
-  -- PNPM tasks
-  ["pnpm-lint"] = pnpm.create_pnpm_task("lint", {
-    label = "PNPM Lint",
-    when = function() return vim.fn.filereadable("package.json") == 1 end,
-  }),
-  
-  ["pnpm-test"] = pnpm.create_pnpm_task("test", {
-    label = "PNPM Test",
-    when = function() return vim.fn.filereadable("package.json") == 1 end,
-  }),
-  
-  ["pnpm-build"] = pnpm.create_pnpm_task("build", {
-    label = "PNPM Build",
-    when = function() return vim.fn.filereadable("package.json") == 1 end,
-  }),
+  -- Base PNPM task for extension
+  ["pnpm"] = pnpm.base_task,
   
   -- Simple example task
   ["example-task"] = {
     id = "example-task",
     label = "Example Task",
-    command = "echo 'This is an example task' && exit 0",
+    command = "echo 'This is an example task'",
   },
 }
 

@@ -53,10 +53,51 @@ function M.run_task(win_id, task)
   -- Start UI update timer if not already running
   M.start_ui_updates(win_id)
   
+  -- Determine the command to run
+  local cmd
+  if type(task.command) == "function" then
+    -- If command is a function, call it with the task as argument
+    cmd = task.command(task)
+  else
+    -- Otherwise use the command string directly
+    cmd = task.command
+  end
+  
+  -- If cmd is nil or empty, skip this task
+  if not cmd or cmd == "" then
+    M.tasks[task.id].state = M.TASK_STATE.SUCCESS
+    vim.schedule(function()
+      M.update_ui(win_id)
+      M.update_signs(win_id)
+    end)
+    return
+  end
+  
+  -- Handle special commands like "exit 0" or "exit 1"
+  if cmd == "exit 0" then
+    M.tasks[task.id].state = M.TASK_STATE.SUCCESS
+    vim.schedule(function()
+      M.update_ui(win_id)
+      M.update_signs(win_id)
+    end)
+    return
+  elseif cmd == "exit 1" then
+    M.tasks[task.id].state = M.TASK_STATE.FAILED
+    vim.schedule(function()
+      M.update_ui(win_id)
+      M.update_signs(win_id)
+    end)
+    return
+  end
+  
+  -- Split the command into parts for vim.system
+  local cmd_parts = {}
+  for part in cmd:gmatch("%S+") do
+    table.insert(cmd_parts, part)
+  end
+  
   -- Run the task asynchronously
-  vim.system({
-    "sleep", "5", -- Hardcoded sleep command for now
-  }, {
+  vim.system(cmd_parts, {
     stdout = function(err, data)
       if data then
         M.tasks[task.id].output = M.tasks[task.id].output .. data
