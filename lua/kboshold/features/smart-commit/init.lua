@@ -16,6 +16,7 @@ M.config = config_loader.defaults
 
 -- Setup function to initialize the plugin with user config
 ---@param opts SmartCommitConfig|nil User configuration table
+---@return SmartCommit The plugin instance
 function M.setup(opts)
   -- Load configuration from files
   local file_config = config_loader.load_config()
@@ -78,6 +79,7 @@ function M.create_autocommands()
 end
 
 -- Handler for when a commit buffer is opened
+---@param bufnr number The buffer number of the commit buffer
 function M.on_commit_buffer_open(bufnr)
   local win_id = vim.fn.bufwinid(bufnr)
 
@@ -130,6 +132,43 @@ function M.toggle()
   else
     M.enable()
   end
+end
+
+-- Register a custom task
+---@param id string The task ID
+---@param task SmartCommitTask The task configuration
+function M.register_task(id, task)
+  -- Ensure task has an ID
+  task.id = id
+  
+  -- Add to the tasks configuration
+  M.config.tasks[id] = task
+end
+
+-- Run tasks manually
+---@param win_id number|nil The window ID to run tasks in (defaults to current window)
+function M.run_tasks()
+  local win_id = vim.api.nvim_get_current_win()
+  local buf_id = vim.api.nvim_win_get_buf(win_id)
+  
+  -- Show initial header
+  ---@type StickyHeaderContent
+  local content = {
+    {
+      { text = "Smart Commit ", highlight_group = "Title" },
+      { text = "Manual Run", highlight_group = "String" },
+    },
+    {
+      { text = "Status: ", highlight_group = "Label" },
+      { text = "Running tasks...", highlight_group = "DiagnosticInfo" },
+    },
+  }
+
+  -- Show the header
+  ui.set(win_id, content)
+
+  -- Run tasks from configuration with dependency tracking
+  runner.run_tasks_with_dependencies(win_id, M.config.tasks, M.config)
 end
 
 -- Initialize with default settings if not explicitly set up

@@ -18,7 +18,7 @@ M.TASK_STATE = {
 }
 
 -- Current task state
----@type table<string, {state: string, output: string, start_time: number}>
+---@type table<string, {state: string, output: string, start_time: number, end_time: number?}>
 M.tasks = {}
 
 -- Overall process timing
@@ -237,6 +237,7 @@ function M.run_command(win_id, buf_id, task, cmd, all_tasks, config)
 end
 
 -- Check if all tasks are complete
+---@return boolean True if all tasks are complete
 function M.all_tasks_complete()
   for _, task in pairs(M.tasks) do
     if
