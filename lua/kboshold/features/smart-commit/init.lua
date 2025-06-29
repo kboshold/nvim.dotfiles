@@ -98,7 +98,7 @@ function M.on_commit_buffer_open(bufnr)
   ui.set(win_id, content)
   
   -- Run tasks from configuration with dependency tracking
-  runner.run_tasks_with_dependencies(win_id, M.config.tasks)
+  runner.run_tasks_with_dependencies(win_id, M.config.tasks, M.config)
 end
 
 -- Enable the plugin

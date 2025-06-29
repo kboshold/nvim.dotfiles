@@ -11,6 +11,7 @@ M.defaults = {
   defaults = {
     auto_run = true,
     sign_column = true,
+    hide_skipped = false, -- Whether to hide skipped tasks in the UI
     status_window = {
       enabled = true,
       position = "bottom",

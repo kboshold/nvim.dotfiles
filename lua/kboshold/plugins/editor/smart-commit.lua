@@ -11,6 +11,7 @@ return {
       defaults = {
         auto_run = true,
         sign_column = true,
+        hide_skipped = true,
         status_window = {
           enabled = true,
           position = "bottom",
@@ -22,7 +23,9 @@ return {
   keys = {
     {
       "<leader>sc",
-      function() require("kboshold.features.smart-commit").toggle() end,
+      function()
+        require("kboshold.features.smart-commit").toggle()
+      end,
       desc = "Toggle Smart Commit",
     },
   },

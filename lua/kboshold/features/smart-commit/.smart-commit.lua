@@ -5,6 +5,7 @@ return {
   defaults = {
     auto_run = true,
     sign_column = true,
+    hide_skipped = true, -- Hide tasks that were skipped
     status_window = {
       enabled = true,
       position = "bottom",

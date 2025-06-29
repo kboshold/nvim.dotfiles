@@ -48,7 +48,8 @@ setup_signs()
 ---@param win_id number The window ID of the commit buffer
 ---@param task SmartCommitTask The task to run
 ---@param all_tasks table<string, SmartCommitTask|false>|nil All tasks configuration
-function M.run_task(win_id, task, all_tasks)
+---@param config SmartCommitConfig|nil The full configuration
+function M.run_task(win_id, task, all_tasks, config)
   -- Ensure task has an ID
   if not task.id then
     vim.notify("Task has no ID, skipping", vim.log.levels.ERROR)
@@ -92,7 +93,7 @@ function M.run_task(win_id, task, all_tasks)
       end)
     elseif type(result) == "string" then
       -- String result is a command to run
-      M.run_command(win_id, buf_id, task, result, all_tasks)
+      M.run_command(win_id, buf_id, task, result, all_tasks, config)
     else
       -- Nil result means the handler is managing the task state asynchronously
       -- We'll just update the UI to show the running state
@@ -149,7 +150,7 @@ function M.run_task(win_id, task, all_tasks)
   end
   
   -- Run the command
-  M.run_command(win_id, buf_id, task, cmd, all_tasks)
+  M.run_command(win_id, buf_id, task, cmd, all_tasks, config)
 end
 
 -- Run a shell command for a task
@@ -158,19 +159,20 @@ end
 ---@param task SmartCommitTask The task to run
 ---@param cmd string The command to run
 ---@param all_tasks table<string, SmartCommitTask|false>|nil All tasks configuration
-function M.run_command(win_id, buf_id, task, cmd, all_tasks)
+---@param config SmartCommitConfig|nil The full configuration
+function M.run_command(win_id, buf_id, task, cmd, all_tasks, config)
   -- Handle special commands like "exit 0" or "exit 1"
   if cmd == "exit 0" then
     M.tasks[task.id].state = M.TASK_STATE.SUCCESS
     vim.schedule(function()
-      M.update_ui(win_id, all_tasks)
+      M.update_ui(win_id, all_tasks, config)
       M.update_signs(win_id)
     end)
     return
   elseif cmd == "exit 1" then
     M.tasks[task.id].state = M.TASK_STATE.FAILED
     vim.schedule(function()
-      M.update_ui(win_id, all_tasks)
+      M.update_ui(win_id, all_tasks, config)
       M.update_signs(win_id)
     end)
     return
@@ -206,7 +208,7 @@ function M.run_command(win_id, buf_id, task, cmd, all_tasks)
     
     -- Update UI with the final state
     vim.schedule(function()
-      M.update_ui(win_id, all_tasks)
+      M.update_ui(win_id, all_tasks, config)
       M.update_signs(win_id)
       
       -- Stop timer if all tasks are complete
@@ -233,7 +235,8 @@ end
 -- Start periodic UI updates
 ---@param win_id number The window ID of the commit buffer
 ---@param tasks table<string, SmartCommitTask|false>|nil The tasks configuration
-function M.start_ui_updates(win_id, tasks)
+---@param config SmartCommitConfig|nil The full configuration
+function M.start_ui_updates(win_id, tasks, config)
   if update_timer then
     return
   end
@@ -246,7 +249,7 @@ function M.start_ui_updates(win_id, tasks)
         utils.advance_spinner_frame()
         
         -- Update UI and signs
-        M.update_ui(win_id, tasks)
+        M.update_ui(win_id, tasks, config)
         M.update_signs(win_id)
         
         -- Check if all tasks are complete and stop the timer if they are
@@ -319,8 +322,10 @@ end
 -- Update the UI with current task states
 ---@param win_id number The window ID of the commit buffer
 ---@param tasks table<string, SmartCommitTask|false>|nil The tasks configuration
-function M.update_ui(win_id, tasks)
+---@param config SmartCommitConfig|nil The full configuration
+function M.update_ui(win_id, tasks, config)
   tasks = tasks or {}  -- Default to empty table if not provided
+  config = config or {} -- Default to empty table if not provided
   -- Create header content based on task states
   ---@type StickyHeaderContent
   local content = {
@@ -385,16 +390,25 @@ function M.update_ui(win_id, tasks)
   
   -- Add task status lines
   local task_count = #task_keys
+  local visible_tasks = 0
+  
   for i, id in ipairs(task_keys) do
     local task_state = M.tasks[id]
+    
+    -- Skip this task if it's skipped and hide_skipped is true
+    if task_state.state == M.TASK_STATE.SKIPPED and config and config.defaults and config.defaults.hide_skipped then
+      goto continue
+    end
+    
+    visible_tasks = visible_tasks + 1
     local status_text = ""
     local status_hl = ""
     local border_char = utils.BORDERS.MIDDLE
     local task_config = tasks[id]
     local task_icon = task_config and task_config.icon or ""
     
-    -- Use bottom border for the last task
-    if i == task_count then
+    -- Use bottom border for the last visible task
+    if visible_tasks == task_count or i == #task_keys then
       border_char = utils.BORDERS.BOTTOM
     end
     
@@ -442,6 +456,8 @@ function M.update_ui(win_id, tasks)
       { text = display_text .. " ", highlight_group = "Identifier" },
       { text = status_text, highlight_group = status_hl },
     })
+    
+    ::continue::
   end
   
   -- Update the header
@@ -451,7 +467,8 @@ end
 -- Run tasks with dependency tracking
 ---@param win_id number The window ID of the commit buffer
 ---@param tasks table<string, SmartCommitTask|false> The tasks to run
-function M.run_tasks_with_dependencies(win_id, tasks)
+---@param config SmartCommitConfig|nil The full configuration
+function M.run_tasks_with_dependencies(win_id, tasks, config)
   -- Set the process start time
   M.process_start_time = vim.loop.now()
   
@@ -468,7 +485,7 @@ function M.run_tasks_with_dependencies(win_id, tasks)
   end
   
   -- Start UI update timer
-  M.start_ui_updates(win_id, tasks)
+  M.start_ui_updates(win_id, tasks, config)
   
   -- First pass: check 'when' conditions and mark tasks as skipped if needed
   for id, task in pairs(tasks) do
@@ -488,7 +505,7 @@ function M.run_tasks_with_dependencies(win_id, tasks)
   end
   
   -- Update UI to show initial states
-  M.update_ui(win_id, tasks)
+  M.update_ui(win_id, tasks, config)
   M.update_signs(win_id)
   
   -- Check if all tasks are already complete (e.g., all skipped)
@@ -500,7 +517,7 @@ function M.run_tasks_with_dependencies(win_id, tasks)
   -- Third pass: run tasks without dependencies that aren't skipped
   for id, task in pairs(tasks) do
     if task and not task.depends_on and M.tasks[id].state == M.TASK_STATE.PENDING then
-      M.run_task(win_id, task, tasks)
+      M.run_task(win_id, task, tasks, config)
     end
   end
   
@@ -529,7 +546,7 @@ function M.run_tasks_with_dependencies(win_id, tasks)
           
           -- If all dependencies are satisfied, run the task
           if can_run then
-            M.run_task(win_id, tasks[id], tasks)
+            M.run_task(win_id, tasks[id], tasks, config)
             ran_something = true
           end
         elseif task_state.state == M.TASK_STATE.PENDING or task_state.state == M.TASK_STATE.RUNNING then
@@ -539,7 +556,7 @@ function M.run_tasks_with_dependencies(win_id, tasks)
       
       -- If all tasks are done or we ran something, update the UI
       if all_done or ran_something then
-        M.update_ui(win_id, tasks)
+        M.update_ui(win_id, tasks, config)
         M.update_signs(win_id)
       end
       

@@ -14,6 +14,7 @@ local M = {}
 ---@field concurrency? number # Max number of concurrent tasks. Default: 4.
 ---@field auto_run? boolean # Automatically run on commit message buffer open. Default: true.
 ---@field sign_column? boolean # Show signs in the sign column. Default: true.
+---@field hide_skipped? boolean # Hide tasks that were skipped. Default: false.
 ---@field status_window? SmartCommitStatusWindowConfig
 
 ---@alias TaskFn fun():(boolean | {ok: boolean, message: string})
