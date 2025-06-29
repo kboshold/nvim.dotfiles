@@ -35,27 +35,27 @@ local function find_file_upwards(filename)
       return git_root_path
     end
   end
-  
+
   -- If not found in Git root, try traversing up from the current directory
   local current_dir = vim.fn.getcwd()
   local path = current_dir .. "/" .. filename
-  
+
   while true do
     if vim.fn.filereadable(path) == 1 then
       return path
     end
-    
+
     -- Move up one directory
     local parent_dir = vim.fn.fnamemodify(current_dir, ":h")
     if parent_dir == current_dir then
       -- We've reached the root directory
       break
     end
-    
+
     current_dir = parent_dir
     path = current_dir .. "/" .. filename
   end
-  
+
   return nil
 end
 
@@ -66,13 +66,13 @@ local function load_lua_file(path)
   if vim.fn.filereadable(path) == 0 then
     return nil
   end
-  
+
   local success, result = pcall(dofile, path)
   if not success then
     vim.notify("Error loading " .. path .. ": " .. result, vim.log.levels.ERROR)
     return nil
   end
-  
+
   return result
 end
 
@@ -81,7 +81,7 @@ end
 ---@return table<string, SmartCommitTask|false> Processed task configurations
 local function process_tasks(tasks)
   local result = {}
-  
+
   -- First pass: handle shorthand syntax and copy tasks without 'extend'
   for id, task in pairs(tasks) do
     -- Handle shorthand syntax: ["predefined:task"] = true
@@ -93,7 +93,6 @@ local function process_tasks(tasks)
         local base_task = vim.deepcopy(predefined.get(predefined_id))
         -- Use the original ID to avoid duplicates
         result[id] = base_task
-        vim.notify("Added predefined task: " .. id, vim.log.levels.WARN)
       else
         vim.notify("Unknown predefined task: " .. id, vim.log.levels.WARN)
       end
@@ -101,22 +100,22 @@ local function process_tasks(tasks)
     elseif task ~= false and not task.extend then
       -- Make a copy of the task
       local task_copy = vim.deepcopy(task)
-      
+
       -- If id is not set, use the key as the id
       if not task_copy.id then
         task_copy.id = id
       end
-      
+
       result[id] = task_copy
     end
   end
-  
+
   -- Second pass: process tasks with 'extend'
   for id, task in pairs(tasks) do
     if type(task) == "table" and task.extend then
       -- Find the base task
       local base_task = nil
-      
+
       -- Check if it's a predefined task
       if predefined.get(task.extend) then
         base_task = vim.deepcopy(predefined.get(task.extend))
@@ -124,16 +123,16 @@ local function process_tasks(tasks)
       elseif result[task.extend] then
         base_task = vim.deepcopy(result[task.extend])
       end
-      
+
       if base_task then
         -- Make a copy of the task
         local task_copy = vim.deepcopy(task)
-        
+
         -- If id is not set, use the key as the id
         if not task_copy.id then
           task_copy.id = id
         end
-        
+
         -- Merge the task with the base task (task properties override base)
         local merged_task = vim.tbl_deep_extend("force", base_task, task_copy)
         -- Remove the 'extend' property as it's no longer needed
@@ -143,20 +142,20 @@ local function process_tasks(tasks)
         -- Error: Task extends an unknown task
         local error_msg = "Task '" .. id .. "' extends unknown task '" .. task.extend .. "'"
         vim.notify(error_msg, vim.log.levels.ERROR)
-        
+
         -- Set the task to false to disable it
         result[id] = false
       end
     end
   end
-  
+
   -- Third pass: handle disabled tasks (set to false)
   for id, task in pairs(tasks) do
     if task == false then
       result[id] = false
     end
   end
-  
+
   return result
 end
 
@@ -164,41 +163,31 @@ end
 ---@return SmartCommitConfig The merged configuration
 function M.load_config()
   local config = vim.deepcopy(M.defaults)
-  
+
   -- 1. Load user global config from ~/.smart-commit.lua
   local user_config_path = vim.fn.expand("~/.smart-commit.lua")
   local user_config = load_lua_file(user_config_path)
   if user_config then
     -- Process tasks before merging
     if user_config.tasks then
-      vim.notify("Processing user config tasks: " .. vim.inspect(vim.tbl_keys(user_config.tasks)), vim.log.levels.WARN)
       user_config.tasks = process_tasks(user_config.tasks)
     end
     config = vim.tbl_deep_extend("force", config, user_config)
   end
-  
+
   -- 2. Load project-specific config from .smart-commit.lua in the project
   local project_config_path = find_file_upwards(".smart-commit.lua")
   if project_config_path then
-    vim.notify("Found project config at: " .. project_config_path, vim.log.levels.WARN)
     local project_config = load_lua_file(project_config_path)
     if project_config then
       -- Process tasks before merging
       if project_config.tasks then
-        vim.notify("Processing project config tasks: " .. vim.inspect(vim.tbl_keys(project_config.tasks)), vim.log.levels.WARN)
         project_config.tasks = process_tasks(project_config.tasks)
       end
       config = vim.tbl_deep_extend("force", config, project_config)
     end
-  else
-    vim.notify("No project config found", vim.log.levels.WARN)
   end
-  
-  -- Check if we have any tasks
-  if vim.tbl_isempty(config.tasks) then
-    vim.notify("No tasks found in configuration", vim.log.levels.ERROR)
-  end
-  
+
   return config
 end
 

@@ -14,17 +14,6 @@ local function get_current_branch()
   return vim.trim(result)
 end
 
--- Get the staged changes as a diff
----@return string The staged changes as a diff
-local function get_staged_changes()
-  local result = vim.fn.system("git diff --staged")
-  if vim.v.shell_error ~= 0 then
-    vim.notify("Failed to get staged changes", vim.log.levels.WARN)
-    return ""
-  end
-  return result
-end
-
 -- Parse branch name to determine commit scope
 ---@param branch_name string The branch name to parse
 ---@return string|nil scope The commit scope or nil if not found
@@ -71,18 +60,6 @@ M.analyze_staged = {
 
     local CopilotChat = require("CopilotChat")
 
-    -- Get staged changes
-    local staged_changes = get_staged_changes()
-    if staged_changes == "" then
-      vim.notify("No staged changes to analyze", vim.log.levels.WARN)
-      ctx.runner.tasks[ctx.task.id].output = "No staged changes to analyze"
-      ctx.runner.tasks[ctx.task.id].state = ctx.runner.TASK_STATE.SKIPPED
-      ctx.runner.tasks[ctx.task.id].end_time = vim.loop.now()
-      ctx.runner.update_ui(ctx.win_id)
-      ctx.runner.update_signs(ctx.win_id)
-      return nil
-    end
-
     -- Construct the prompt for Copilot
     local prompt = [[
 Analyze the staged code changes and provide a concise summary of:
@@ -117,11 +94,11 @@ If there are no issues in a category, simply state "No issues found".
           end)
           return
         end
-        
+
         -- Check for quota exceeded message
         if response:match("[Qq]uota exceeded") or response:match("[Qq]uota extended") then
           vim.notify("Copilot quota exceeded", vim.log.levels.ERROR)
-          
+
           -- Update task status to failed
           vim.schedule(function()
             ctx.runner.tasks[ctx.task.id].output = "Copilot quota exceeded"
@@ -220,11 +197,11 @@ Only create the commit message. Do not explain anything!
           end)
           return
         end
-        
+
         -- Check for quota exceeded message
         if response:match("[Qq]uota exceeded") or response:match("[Qq]uota extended") then
           vim.notify("Copilot quota exceeded", vim.log.levels.ERROR)
-          
+
           -- Update task status to failed
           vim.schedule(function()
             ctx.runner.tasks[ctx.task.id].output = "Copilot quota exceeded"
