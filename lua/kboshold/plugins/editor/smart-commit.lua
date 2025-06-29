@@ -4,6 +4,7 @@ return {
   lazy = false,
   dependencies = {
     "nvim-lua/plenary.nvim",
+    "CopilotC-Nvim/CopilotChat.nvim", -- Required for commit message generation
   },
   config = function()
     require("kboshold.features.smart-commit").setup({

@@ -23,7 +23,6 @@ M.tasks = {
   
   -- Copilot tasks
   ["generate-commit-message"] = copilot.generate_commit_message,
-  ["analyze-staged"] = copilot.analyze_staged,
 }
 
 -- Get a predefined task by ID

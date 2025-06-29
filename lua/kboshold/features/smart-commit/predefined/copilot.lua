@@ -25,91 +25,35 @@ local function get_staged_changes()
   return result
 end
 
--- Parse branch name to determine commit type and scope
+-- Parse branch name to determine commit scope
 ---@param branch_name string The branch name to parse
----@return string type The commit type (feat, fix, etc.)
 ---@return string|nil scope The commit scope or nil if not found
-local function parse_branch_name(branch_name)
-  -- Default values
-  local type = "feat"
-  local scope = nil
+local function get_commit_scope()
+  local branch = get_current_branch()
+  if not branch then
+    return nil
+  end
   
-  -- Try to match branch pattern: feat/scope, feature/scope, bugfix/scope, hotfix/scope
-  local pattern = "^(feat|feature|bugfix|hotfix)/([a-zA-Z0-9_-]+)"
-  local branch_type, branch_scope = branch_name:match(pattern)
-  
-  if branch_type then
-    -- Normalize "feature" to "feat"
-    if branch_type == "feature" then
-      type = "feat"
-    else
-      type = branch_type
+  local scope = ""
+  if branch ~= "main" and branch ~= "develop" then
+    scope = branch:match("^[^/]+/(.+)")
+
+    if scope and scope:match("%-") then
+      local ticket_num = scope:match("^(%d+)%-?")
+      if ticket_num then
+        scope = "#" .. ticket_num
+      else
+        local jira_ticket = scope:match("^([A-Z]+%-[0-9]+)%-?")
+        if jira_ticket then
+          scope = jira_ticket
+        else
+          scope = "#" .. scope:match("^([^-]+)")
+        end
+      end
     end
-    
-    -- Check if scope is purely numeric (issue number)
-    if branch_scope:match("^%d+$") then
-      scope = "#" .. branch_scope
-    else
-      scope = branch_scope
-    end
   end
-  
-  return type, scope
-end
 
--- Construct the commit prefix based on type and scope
----@param type string The commit type
----@param scope string|nil The commit scope
----@return string The formatted commit prefix
-local function construct_commit_prefix(type, scope)
-  if scope then
-    return type .. "(" .. scope .. "): "
-  else
-    return type .. ": "
-  end
-end
-
--- Generate a commit message using Copilot
----@param prefix string The commit prefix (e.g., "feat(scope): ")
----@param staged_diff string The staged changes as a diff
----@return string The generated commit message
-local function generate_commit_message(prefix, staged_diff)
-  -- Check if CopilotChat is available
-  if not pcall(require, "CopilotChat") then
-    vim.notify("CopilotChat.nvim is not available", vim.log.levels.ERROR)
-    return prefix .. "Add changes"
-  end
-  
-  local CopilotChat = require("CopilotChat")
-  
-  -- Limit the diff size to avoid overwhelming Copilot
-  local max_diff_size = 5000
-  if #staged_diff > max_diff_size then
-    staged_diff = staged_diff:sub(1, max_diff_size) .. "\n... (diff truncated)"
-  end
-  
-  -- Construct the prompt for Copilot
-  local prompt = string.format([[
-Given the commit prefix `%s`, write a concise and informative commit message subject and body based on the following staged changes:
-
-%s
-
-Format your response as a complete commit message with a subject line (max 72 chars) and an optional body separated by a blank line.
-Do not include the prefix in your response, as I will add it automatically.
-Focus on WHAT changed and WHY, not HOW.
-]], prefix, staged_diff)
-
-  -- Call Copilot to generate the message
-  local response = CopilotChat.ask(prompt, {})
-  
-  -- Process the response
-  if response and response ~= "" then
-    -- Remove any markdown formatting that might be in the response
-    response = response:gsub("```[%w]*\n", ""):gsub("```", "")
-    return prefix .. response
-  else
-    return prefix .. "Add changes"
-  end
+  return scope
 end
 
 -- Task to generate a commit message
@@ -119,68 +63,11 @@ M.generate_commit_message = {
   label = "Generate Commit Message",
   icon = "󰚩",
   command = function()
-    -- Get the current branch name
-    local branch_name = get_current_branch()
-    if not branch_name then
-      return "echo 'Failed to get current branch'"
-    end
-    
-    -- Parse branch name to get type and scope
-    local type, scope = parse_branch_name(branch_name)
-    
-    -- Construct the commit prefix
-    local prefix = construct_commit_prefix(type, scope)
+    -- Get commit scope from branch name
+    local scope = get_commit_scope()
     
     -- Get staged changes
     local staged_diff = get_staged_changes()
-    
-    -- Generate the commit message
-    local commit_message = generate_commit_message(prefix, staged_diff)
-    
-    -- Insert the commit message into the buffer
-    local bufnr = vim.fn.bufnr("COMMIT_EDITMSG")
-    if bufnr ~= -1 then
-      -- Clear the buffer first (except for any comments)
-      local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-      local comment_start_line = 0
-      for i, line in ipairs(lines) do
-        if line:match("^%s*#") then
-          comment_start_line = i - 1
-          break
-        end
-      end
-      
-      if comment_start_line > 0 then
-        vim.api.nvim_buf_set_lines(bufnr, 0, comment_start_line, false, {})
-      end
-      
-      -- Insert the commit message
-      local message_lines = {}
-      for line in commit_message:gmatch("[^\r\n]+") do
-        table.insert(message_lines, line)
-      end
-      
-      vim.api.nvim_buf_set_lines(bufnr, 0, 0, false, message_lines)
-      
-      return "echo 'Commit message generated'"
-    else
-      return "echo 'COMMIT_EDITMSG buffer not found'"
-    end
-  end,
-}
-
--- Task to analyze staged changes
----@type SmartCommitTask
-M.analyze_staged = {
-  id = "analyze-staged",
-  label = "Analyze Staged Changes",
-  icon = "󰌵",
-  command = function()
-    -- Get staged changes
-    local staged_diff = get_staged_changes()
-    if staged_diff == "" then
-      return "echo 'No staged changes to analyze'"
-    end
     
     -- Check if CopilotChat is available
     if not pcall(require, "CopilotChat") then
@@ -189,58 +76,112 @@ M.analyze_staged = {
     end
     
     local CopilotChat = require("CopilotChat")
+    local bufnr = vim.fn.bufnr("COMMIT_EDITMSG")
     
-    -- Limit the diff size
-    local max_diff_size = 5000
-    if #staged_diff > max_diff_size then
-      staged_diff = staged_diff:sub(1, max_diff_size) .. "\n... (diff truncated)"
+    if bufnr == -1 then
+      return "echo 'COMMIT_EDITMSG buffer not found'"
     end
     
-    -- Construct the prompt for Copilot
-    local prompt = string.format([[
-Analyze the following staged changes for potential issues:
-1. Debug statements (console.log, print, etc.)
-2. Commented-out code
-3. Obvious errors or bugs
-4. TODOs or FIXMEs
-5. Sensitive information (API keys, tokens, etc.)
+    -- Construct the prompt for Copilot based on the old prompt.lua
+    local prompt = [[
+Write a conventional commits style (https://www.conventionalcommits.org/en/v1.0.0/) commit message for my changes. Please create only the code block without further explanations.
 
-Provide a brief summary of any issues found:
+**Requirements:**
 
-%s
-]], staged_diff)
+- Title: under 50 characters and talk imperative. Follow this rule: If applied, this commit will <commit message>
+- Body: wrap at 72 characters
+- Include essential information only
+- Format as `gitcommit` code block
+- Prepend a header with the lines to replace. It should only replace the lines in font of the first comment.
+- Use `]] .. (scope or "") .. [[` as the scope. If the scope is empty then skip it. If it includes a `#`, also add it in the scope.
+- End the commit body with a newline followed by 52 hyphens as a comment starting with `#`.
+- Add some usefull comments about the code after the ruler as a comment
+-- Is debbuging output in the newly added code. If so, add the files and line number or write `None`.
+-- Possible errors introduced by the newly created code
+-- Possible optimizations that should be added to the new code
+-- It is not allowed to have any multiline code in this comment. Always refer to files and their line number.
 
-    -- Call Copilot to analyze the changes
-    local response = CopilotChat.ask(prompt, {})
+Use the following example as reference. Do only use it to understand the format but dont use the information of it.
+
+```gitcommit
+feat(scope): add login functionality
+
+Implement user authentication flow with proper validation
+and error handling. Connects to the auth API endpoint.
+
+# --------------------------------------------------
+# Debugging Output:
+# - [main.js:34](./src/main.js:34): Usage of `debugger` statement.
+# - [compiler.js:528](./src/compiler.js:528): Usage of `console.log`.
+#
+# Possible Issues:
+# - [main.js:45](./src/main.js:45): Missing check for `null`.
+#
+# Possible Optimizations:
+# - [main.js:156](./src/main.js:156): Use `let` instead of `var`
+# - [main.js:195](./src/main.js:195): Optimize the data structure to improve performance
+#
+```
+
+Only create the commit message. Do not explain anything!
+]]
+
+    -- Create a task to track status
+    local task_completed = false
     
-    -- Process the response
-    if response and response ~= "" then
-      -- Remove any markdown formatting
-      response = response:gsub("```[%w]*\n", ""):gsub("```", "")
-      
-      -- Create a temporary buffer to show the analysis
-      local analysis_bufnr = vim.api.nvim_create_buf(false, true)
-      vim.api.nvim_buf_set_option(analysis_bufnr, "buftype", "nofile")
-      vim.api.nvim_buf_set_option(analysis_bufnr, "bufhidden", "wipe")
-      vim.api.nvim_buf_set_name(analysis_bufnr, "SmartCommit-Analysis")
-      
-      -- Split the response into lines
-      local analysis_lines = {}
-      for line in response:gmatch("[^\r\n]+") do
-        table.insert(analysis_lines, line)
+    -- Use headless mode with callback
+    CopilotChat.ask(prompt, {
+      headless = true,
+      context = {
+        "git:staged",
+        "file:`.git/COMMIT_EDITMSG`",
+      },
+      callback = function(response)
+        if not response or response == "" then
+          vim.notify("Failed to generate commit message", vim.log.levels.ERROR)
+          task_completed = true
+          return
+        end
+        
+        -- Extract the gitcommit code block if present
+        local commit_message = response:match("```gitcommit\n(.-)\n```")
+        if not commit_message then
+          -- If no code block found, just clean up markdown formatting
+          commit_message = response:gsub("```[%w]*\n", ""):gsub("```", "")
+        end
+        
+        -- Insert the commit message into the buffer
+        vim.schedule(function()
+          -- Clear the buffer first (except for any comments)
+          local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+          local comment_start_line = 0
+          for i, line in ipairs(lines) do
+            if line:match("^%s*#") then
+              comment_start_line = i - 1
+              break
+            end
+          end
+          
+          if comment_start_line > 0 then
+            vim.api.nvim_buf_set_lines(bufnr, 0, comment_start_line, false, {})
+          end
+          
+          -- Insert the commit message
+          local message_lines = {}
+          for line in commit_message:gmatch("[^\r\n]+") do
+            table.insert(message_lines, line)
+          end
+          
+          vim.api.nvim_buf_set_lines(bufnr, 0, 0, false, message_lines)
+          vim.notify("Commit message generated", vim.log.levels.INFO)
+        end)
+        
+        task_completed = true
       end
-      
-      -- Set the buffer content
-      vim.api.nvim_buf_set_lines(analysis_bufnr, 0, -1, false, analysis_lines)
-      
-      -- Open the buffer in a split
-      vim.cmd("split")
-      vim.api.nvim_win_set_buf(0, analysis_bufnr)
-      
-      return "echo 'Analysis complete'"
-    else
-      return "echo 'Failed to analyze staged changes'"
-    end
+    })
+    
+    -- Return a command that will be shown in the UI while waiting for the callback
+    return "echo 'Generating commit message with Copilot...'"
   end,
 }
 
