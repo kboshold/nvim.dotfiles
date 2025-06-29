@@ -12,17 +12,9 @@ local M = {}
 M.tasks = {
   -- Base PNPM task for extension
   ["pnpm"] = pnpm.base_task,
-  
-  -- Simple example task
-  ["example-task"] = {
-    id = "example-task",
-    label = "Example Task",
-    icon = "󰛨",
-    command = "echo 'This is an example task'",
-  },
-  
+
   -- Copilot tasks
-  ["generate-commit-message"] = copilot.generate_commit_message,
+  ["copilot:message"] = copilot.generate_commit_message,
 }
 
 -- Get a predefined task by ID
@@ -34,7 +26,7 @@ function M.get(id)
   if not task then
     vim.notify("Predefined task not found: " .. id, vim.log.levels.WARN)
   end
-  
+
   return task
 end
 

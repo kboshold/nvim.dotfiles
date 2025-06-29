@@ -40,10 +40,11 @@ return {
       depends_on = { "pnpm-prisma-generate" },
     },
     
-    -- Generate commit message task
-    ["generate-commit-message"] = {
+    -- Copilot message task
+    ["copilot-message"] = {
       extend = "generate-commit-message",
       label = "Generate Commit Message with Copilot",
+      icon = "󰚩",
     },
   },
 }
