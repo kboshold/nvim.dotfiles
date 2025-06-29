@@ -81,13 +81,8 @@ function M.on_commit_buffer_open()
   -- Debug: Show loaded tasks
   vim.notify("Loaded tasks: " .. vim.inspect(vim.tbl_keys(M.config.tasks)), vim.log.levels.DEBUG)
   
-  -- Run tasks from configuration
-  for id, task_config in pairs(M.config.tasks) do
-    if task_config then  -- Skip tasks that are set to false
-      vim.notify("Running task: " .. id, vim.log.levels.INFO)
-      runner.run_task(win_id, task_config)
-    end
-  end
+  -- Run tasks from configuration with dependency tracking
+  runner.run_tasks_with_dependencies(win_id, M.config.tasks)
 end
 
 -- Enable the plugin
