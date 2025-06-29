@@ -2,6 +2,7 @@
 -- Author: kboshold
 
 local pnpm = require("kboshold.features.smart-commit.predefined.pnpm")
+local copilot = require("kboshold.features.smart-commit.predefined.copilot")
 
 ---@class PredefinedTasks
 local M = {}
@@ -16,8 +17,13 @@ M.tasks = {
   ["example-task"] = {
     id = "example-task",
     label = "Example Task",
+    icon = "󰛨",
     command = "echo 'This is an example task'",
   },
+  
+  -- Copilot tasks
+  ["generate-commit-message"] = copilot.generate_commit_message,
+  ["analyze-staged"] = copilot.analyze_staged,
 }
 
 -- Get a predefined task by ID
