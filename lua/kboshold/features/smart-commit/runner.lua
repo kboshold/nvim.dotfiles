@@ -10,7 +10,7 @@ local M = {}
 -- Task states
 M.TASK_STATE = {
   PENDING = "pending",
-  WAITING = "waiting", -- New state for tasks waiting on dependencies
+  WAITING = "waiting",  -- New state for tasks waiting on dependencies
   RUNNING = "running",
   SUCCESS = "success",
   FAILED = "failed",
@@ -30,11 +30,11 @@ local function setup_signs()
   vim.fn.sign_define("SmartCommitSuccess", { text = utils.ICONS.SUCCESS, texthl = "DiagnosticOk" })
   vim.fn.sign_define("SmartCommitError", { text = utils.ICONS.ERROR, texthl = "DiagnosticError" })
   vim.fn.sign_define("SmartCommitWarning", { text = utils.ICONS.WARNING, texthl = "DiagnosticWarn" })
-
+  
   -- Signs with count
   for i = 1, 9 do
-    vim.fn.sign_define("SmartCommitError" .. i, { text = utils.ICONS.ERROR .. i, texthl = "DiagnosticError" })
-    vim.fn.sign_define("SmartCommitSuccess" .. i, { text = utils.ICONS.SUCCESS .. i, texthl = "DiagnosticOk" })
+    vim.fn.sign_define("SmartCommitError" .. i, { text = i .. utils.ICONS.ERROR, texthl = "DiagnosticError" })
+    vim.fn.sign_define("SmartCommitSuccess" .. i, { text = i .. utils.ICONS.SUCCESS, texthl = "DiagnosticOk" })
   end
 end
 
@@ -44,60 +44,73 @@ setup_signs()
 -- Run a simple task
 ---@param win_id number The window ID of the commit buffer
 ---@param task SmartCommitTask The task to run
-function M.run_task(win_id, task)
+---@param all_tasks table<string, SmartCommitTask|false>|nil All tasks configuration
+function M.run_task(win_id, task, all_tasks)
+  -- Debug task info
+  vim.notify("Running task: " .. task.id, vim.log.levels.DEBUG)
+  
+  -- Ensure task has an ID
+  if not task.id then
+    vim.notify("Task has no ID, skipping", vim.log.levels.ERROR)
+    return
+  end
+  
   -- Initialize task state
   M.tasks[task.id] = {
     state = M.TASK_STATE.RUNNING,
     output = "",
     start_time = vim.loop.now(),
   }
-
+  
   -- Start UI update timer if not already running
-  M.start_ui_updates(win_id)
-
+  M.start_ui_updates(win_id, all_tasks)
+  
   -- Determine the command to run
   local cmd
   if type(task.command) == "function" then
     -- If command is a function, call it with the task as argument
+    vim.notify("Executing function command for task: " .. task.id, vim.log.levels.DEBUG)
     cmd = task.command(task)
   else
     -- Otherwise use the command string directly
+    vim.notify("Using string command for task: " .. task.id .. ": " .. (task.command or "nil"), vim.log.levels.DEBUG)
     cmd = task.command
   end
-
+  
   -- If cmd is nil or empty, skip this task
   if not cmd or cmd == "" then
+    vim.notify("Empty command for task: " .. task.id .. ", marking as success", vim.log.levels.WARN)
     M.tasks[task.id].state = M.TASK_STATE.SUCCESS
     vim.schedule(function()
-      M.update_ui(win_id)
+      M.update_ui(win_id, all_tasks)
       M.update_signs(win_id)
     end)
     return
   end
-
+  
   -- Handle special commands like "exit 0" or "exit 1"
   if cmd == "exit 0" then
     M.tasks[task.id].state = M.TASK_STATE.SUCCESS
     vim.schedule(function()
-      M.update_ui(win_id)
+      M.update_ui(win_id, all_tasks)
       M.update_signs(win_id)
     end)
     return
   elseif cmd == "exit 1" then
     M.tasks[task.id].state = M.TASK_STATE.FAILED
     vim.schedule(function()
-      M.update_ui(win_id)
+      M.update_ui(win_id, all_tasks)
       M.update_signs(win_id)
     end)
     return
   end
-
+  
   -- Split the command into parts for vim.system
   local cmd_parts = {}
   for part in cmd:gmatch("%S+") do
     table.insert(cmd_parts, part)
   end
-
+  
   -- Run the task asynchronously
   vim.system(cmd_parts, {
     stdout = function(err, data)
@@ -117,19 +130,19 @@ function M.run_task(win_id, task)
     else
       M.tasks[task.id].state = M.TASK_STATE.FAILED
     end
-
+    
     -- Update UI with the final state
     vim.schedule(function()
-      M.update_ui(win_id)
+      M.update_ui(win_id, all_tasks)
       M.update_signs(win_id)
-
+      
       -- Stop timer if all tasks are complete
       if M.all_tasks_complete() then
         M.stop_ui_updates()
       end
     end)
   end)
-
+  
   -- Update signs immediately
   M.update_signs(win_id)
 end
@@ -137,11 +150,7 @@ end
 -- Check if all tasks are complete
 function M.all_tasks_complete()
   for _, task in pairs(M.tasks) do
-    if
-      task.state == M.TASK_STATE.RUNNING
-      or task.state == M.TASK_STATE.PENDING
-      or task.state == M.TASK_STATE.WAITING
-    then
+    if task.state == M.TASK_STATE.RUNNING or task.state == M.TASK_STATE.PENDING or task.state == M.TASK_STATE.WAITING then
       return false
     end
   end
@@ -150,20 +159,21 @@ end
 
 -- Start periodic UI updates
 ---@param win_id number The window ID of the commit buffer
-function M.start_ui_updates(win_id)
+---@param tasks table<string, SmartCommitTask|false>|nil The tasks configuration
+function M.start_ui_updates(win_id, tasks)
   if update_timer then
     return
   end
-
+  
   update_timer = vim.loop.new_timer()
-  update_timer:start(0, 100, function() -- Changed to 100ms for faster animation
+  update_timer:start(0, 100, function()  -- Changed to 100ms for faster animation
     vim.schedule(function()
       if vim.api.nvim_win_is_valid(win_id) then
         -- Advance the spinner frame once per update cycle
         utils.advance_spinner_frame()
-
+        
         -- Update UI and signs
-        M.update_ui(win_id)
+        M.update_ui(win_id, tasks)
         M.update_signs(win_id)
       else
         M.stop_ui_updates()
@@ -185,15 +195,15 @@ end
 ---@param win_id number The window ID of the commit buffer
 function M.update_signs(win_id)
   local buf_id = vim.api.nvim_win_get_buf(win_id)
-
+  
   -- Clear existing signs
   vim.fn.sign_unplace("SmartCommitSigns", { buffer = buf_id })
-
+  
   -- Count tasks by state
   local running_count = 0
   local error_count = 0
   local success_count = 0
-
+  
   for _, task in pairs(M.tasks) do
     if task.state == M.TASK_STATE.RUNNING then
       running_count = running_count + 1
@@ -203,7 +213,7 @@ function M.update_signs(win_id)
       success_count = success_count + 1
     end
   end
-
+  
   -- Place appropriate sign
   if running_count > 0 then
     -- Use the current spinner frame for the running sign
@@ -222,7 +232,7 @@ function M.update_signs(win_id)
     end
     vim.fn.sign_place(0, "SmartCommitSigns", sign_name, buf_id, { lnum = 1 })
   end
-
+  
   -- Force a redraw to update the sign column immediately
   vim.cmd("redrawstatus")
   vim.cmd("redraw!")
@@ -230,7 +240,9 @@ end
 
 -- Update the UI with current task states
 ---@param win_id number The window ID of the commit buffer
-function M.update_ui(win_id)
+---@param tasks table<string, SmartCommitTask|false>|nil The tasks configuration
+function M.update_ui(win_id, tasks)
+  tasks = tasks or {}  -- Default to empty table if not provided
   -- Create header content based on task states
   ---@type StickyHeaderContent
   local content = {
@@ -239,7 +251,7 @@ function M.update_ui(win_id)
       { text = "Tasks", highlight_group = "String" },
     },
   }
-
+  
   -- Check if any task is running
   local any_running = false
   for _, task in pairs(M.tasks) do
@@ -248,7 +260,7 @@ function M.update_ui(win_id)
       break
     end
   end
-
+  
   -- Add status line with spinner if any task is running
   if any_running then
     table.insert(content, {
@@ -264,7 +276,7 @@ function M.update_ui(win_id)
         break
       end
     end
-
+    
     if any_failed then
       table.insert(content, {
         { text = "Status: ", highlight_group = "Label" },
@@ -277,14 +289,14 @@ function M.update_ui(win_id)
       })
     end
   end
-
+  
   -- Get task keys and sort them
   local task_keys = {}
   for id, _ in pairs(M.tasks) do
     table.insert(task_keys, id)
   end
   table.sort(task_keys)
-
+  
   -- Add task status lines
   local task_count = #task_keys
   for i, id in ipairs(task_keys) do
@@ -292,17 +304,19 @@ function M.update_ui(win_id)
     local status_text = ""
     local status_hl = ""
     local border_char = utils.BORDERS.MIDDLE
-
+    local task_config = tasks[id]
+    local task_icon = task_config and task_config.icon or ""
+    
     -- Use bottom border for the last task
     if i == task_count then
       border_char = utils.BORDERS.BOTTOM
     end
-
+    
     if task_state.state == M.TASK_STATE.RUNNING then
       status_text = utils.get_current_spinner_frame() .. " Running..."
       status_hl = "DiagnosticInfo"
     elseif task_state.state == M.TASK_STATE.WAITING then
-      status_text = "󰔟 Waiting for dependencies..."
+      status_text = "⏳ Waiting for dependencies..."
       status_hl = "DiagnosticHint"
     elseif task_state.state == M.TASK_STATE.SUCCESS then
       status_text = utils.ICONS.SUCCESS .. " Success"
@@ -311,21 +325,26 @@ function M.update_ui(win_id)
       status_text = utils.ICONS.ERROR .. " Failed"
       status_hl = "DiagnosticError"
     elseif task_state.state == M.TASK_STATE.SKIPPED then
-      status_text = " Skipped"
+      status_text = " Skipped"
       status_hl = "Comment"
     else
       status_text = "󰔟 Pending"
       status_hl = "Comment"
     end
-
+    
+    -- Add icon if provided
+    local display_id = id
+    if task_icon and task_icon ~= "" then
+      display_id = task_icon .. " " .. id
+    end
+    
     table.insert(content, {
       { text = border_char .. " ", highlight_group = "Comment" },
-      { text = "Task: ", highlight_group = "Label" },
-      { text = id .. " ", highlight_group = "Identifier" },
+      { text = display_id .. " ", highlight_group = "Identifier" },
       { text = status_text, highlight_group = status_hl },
     })
   end
-
+  
   -- Update the header
   ui.set(win_id, content)
 end
@@ -336,7 +355,7 @@ end
 function M.run_tasks_with_dependencies(win_id, tasks)
   -- Initialize all tasks as pending
   for id, task in pairs(tasks) do
-    if task then -- Skip tasks that are set to false
+    if task then  -- Skip tasks that are set to false
       M.tasks[id] = {
         state = M.TASK_STATE.PENDING,
         output = "",
@@ -345,10 +364,10 @@ function M.run_tasks_with_dependencies(win_id, tasks)
       }
     end
   end
-
+  
   -- Start UI update timer
-  M.start_ui_updates(win_id)
-
+  M.start_ui_updates(win_id, tasks)
+  
   -- First pass: check 'when' conditions and mark tasks as skipped if needed
   for id, task in pairs(tasks) do
     if task and task.when and type(task.when) == "function" then
@@ -359,67 +378,66 @@ function M.run_tasks_with_dependencies(win_id, tasks)
       end
     end
   end
-
+  
   -- Second pass: mark tasks with dependencies as waiting
   for id, task_state in pairs(M.tasks) do
     if task_state.state == M.TASK_STATE.PENDING and #task_state.depends_on > 0 then
       task_state.state = M.TASK_STATE.WAITING
     end
   end
-
+  
   -- Update UI to show initial states
-  M.update_ui(win_id)
+  M.update_ui(win_id, tasks)
   M.update_signs(win_id)
-
+  
   -- Third pass: run tasks without dependencies that aren't skipped
   for id, task in pairs(tasks) do
     if task and not task.depends_on and M.tasks[id].state == M.TASK_STATE.PENDING then
       vim.notify("Running task without dependencies: " .. id, vim.log.levels.INFO)
-      M.run_task(win_id, task)
+      M.run_task(win_id, task, tasks)
     end
   end
-
+  
   -- Set up a timer to check for tasks that can be run
   local check_dependencies_timer = vim.loop.new_timer()
   check_dependencies_timer:start(500, 500, function()
     vim.schedule(function()
       local all_done = true
       local ran_something = false
-
+      
       -- Check for tasks that can be run
       for id, task_state in pairs(M.tasks) do
         if task_state.state == M.TASK_STATE.WAITING then
           all_done = false
-
+          
           -- Check if all dependencies are satisfied
           local can_run = true
           for _, dep_id in ipairs(task_state.depends_on) do
-            if
-              not M.tasks[dep_id]
-              or (M.tasks[dep_id].state ~= M.TASK_STATE.SUCCESS and M.tasks[dep_id].state ~= M.TASK_STATE.SKIPPED)
-            then
+            if not M.tasks[dep_id] or 
+               (M.tasks[dep_id].state ~= M.TASK_STATE.SUCCESS and 
+                M.tasks[dep_id].state ~= M.TASK_STATE.SKIPPED) then
               can_run = false
               break
             end
           end
-
+          
           -- If all dependencies are satisfied, run the task
           if can_run then
             vim.notify("Dependencies satisfied for task: " .. id, vim.log.levels.INFO)
-            M.run_task(win_id, tasks[id])
+            M.run_task(win_id, tasks[id], tasks)
             ran_something = true
           end
         elseif task_state.state == M.TASK_STATE.PENDING or task_state.state == M.TASK_STATE.RUNNING then
           all_done = false
         end
       end
-
+      
       -- If all tasks are done or we ran something, update the UI
       if all_done or ran_something then
-        M.update_ui(win_id)
+        M.update_ui(win_id, tasks)
         M.update_signs(win_id)
       end
-
+      
       -- If all tasks are done, stop the timer
       if all_done then
         check_dependencies_timer:stop()

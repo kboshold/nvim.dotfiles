@@ -24,7 +24,18 @@ M.tasks = {
 ---@param id string The task ID
 ---@return SmartCommitTask|nil The task or nil if not found
 function M.get(id)
-  return M.tasks[id]
+  -- Debug logging
+  vim.notify("Looking for predefined task: " .. id, vim.log.levels.DEBUG)
+  vim.notify("Available predefined tasks: " .. vim.inspect(vim.tbl_keys(M.tasks)), vim.log.levels.DEBUG)
+  
+  local task = M.tasks[id]
+  if task then
+    vim.notify("Found predefined task: " .. id, vim.log.levels.DEBUG)
+  else
+    vim.notify("Predefined task not found: " .. id, vim.log.levels.WARN)
+  end
+  
+  return task
 end
 
 -- Register a new predefined task
@@ -32,6 +43,7 @@ end
 ---@param task SmartCommitTask The task definition
 function M.register(id, task)
   M.tasks[id] = task
+  vim.notify("Registered predefined task: " .. id, vim.log.levels.DEBUG)
 end
 
 return M

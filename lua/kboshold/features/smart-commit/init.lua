@@ -40,24 +40,46 @@ end
 function M.create_autocommands()
   local augroup = vim.api.nvim_create_augroup("SmartCommit", { clear = true })
   
+  -- Track which buffers have already been processed
+  local processed_buffers = {}
+  
   vim.api.nvim_create_autocmd("BufEnter", {
     group = augroup,
     pattern = "COMMIT_EDITMSG",
-    callback = function()
+    callback = function(args)
+      -- Check if this buffer has already been processed
+      local bufnr = args.buf
+      if processed_buffers[bufnr] then
+        return
+      end
+      
+      -- Mark this buffer as processed
+      processed_buffers[bufnr] = true
+      
       -- Check if auto_run is enabled and if SMART_COMMIT_ENABLED env var is not set to 0
       local env_disabled = vim.env.SMART_COMMIT_ENABLED == "0"
       
       if M.config.defaults.auto_run and not env_disabled then
-        M.on_commit_buffer_open()
+        M.on_commit_buffer_open(bufnr)
       end
     end,
     desc = "Smart Commit activation on git commit",
   })
+  
+  -- Clean up processed buffers when they are deleted
+  vim.api.nvim_create_autocmd("BufDelete", {
+    group = augroup,
+    pattern = "COMMIT_EDITMSG",
+    callback = function(args)
+      processed_buffers[args.buf] = nil
+    end,
+    desc = "Clean up Smart Commit tracking for deleted buffers",
+  })
 end
 
 -- Handler for when a commit buffer is opened
-function M.on_commit_buffer_open()
-  local win_id = vim.api.nvim_get_current_win()
+function M.on_commit_buffer_open(bufnr)
+  local win_id = vim.fn.bufwinid(bufnr)
   
   -- Show initial header
   ---@type StickyHeaderContent
