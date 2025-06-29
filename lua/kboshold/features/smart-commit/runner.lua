@@ -248,6 +248,11 @@ function M.start_ui_updates(win_id, tasks)
         -- Update UI and signs
         M.update_ui(win_id, tasks)
         M.update_signs(win_id)
+        
+        -- Check if all tasks are complete and stop the timer if they are
+        if M.all_tasks_complete() then
+          M.stop_ui_updates()
+        end
       else
         M.stop_ui_updates()
       end
@@ -485,6 +490,12 @@ function M.run_tasks_with_dependencies(win_id, tasks)
   -- Update UI to show initial states
   M.update_ui(win_id, tasks)
   M.update_signs(win_id)
+  
+  -- Check if all tasks are already complete (e.g., all skipped)
+  if M.all_tasks_complete() then
+    M.stop_ui_updates()
+    return
+  end
   
   -- Third pass: run tasks without dependencies that aren't skipped
   for id, task in pairs(tasks) do
