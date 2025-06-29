@@ -185,8 +185,8 @@ function M.run_command(win_id, buf_id, task, cmd, all_tasks, config)
     table.insert(cmd_parts, part)
   end
 
-  -- Run the task asynchronously
-  vim.system(cmd_parts, {
+  -- Prepare options for vim.system
+  local options = {
     stdout = function(err, data)
       if data then
         M.tasks[task.id].output = M.tasks[task.id].output .. data
@@ -196,8 +196,21 @@ function M.run_command(win_id, buf_id, task, cmd, all_tasks, config)
       if data then
         M.tasks[task.id].output = M.tasks[task.id].output .. data
       end
-    end,
-  }, function(obj)
+    end
+  }
+  
+  -- Set working directory if specified
+  if task.cwd then
+    options.cwd = task.cwd
+  end
+  
+  -- Set environment variables if specified
+  if task.env and type(task.env) == "table" then
+    options.env = task.env
+  end
+  
+  -- Run the task asynchronously
+  vim.system(cmd_parts, options, function(obj)
     -- Update task state based on exit code and set end_time
     M.tasks[task.id].end_time = vim.loop.now()
 
