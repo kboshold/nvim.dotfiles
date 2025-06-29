@@ -66,21 +66,35 @@ local function load_lua_file(path)
 end
 
 -- Process task configurations, resolving 'extend' references
----@param tasks table<string, SmartCommitTask|false> Raw task configurations
+---@param tasks table<string, SmartCommitTask|boolean> Raw task configurations
 ---@return table<string, SmartCommitTask|false> Processed task configurations
 local function process_tasks(tasks)
   local result = {}
   
-  -- First pass: copy tasks without 'extend'
+  -- First pass: handle shorthand syntax and copy tasks without 'extend'
   for id, task in pairs(tasks) do
-    if task ~= false and not task.extend then
+    -- Handle shorthand syntax: ["predefined:task"] = true
+    if type(task) == "boolean" and task == true then
+      -- Check if the ID is a predefined task reference
+      local predefined_id = id:match("^([%w:]+)$")
+      if predefined_id and predefined.get(predefined_id) then
+        -- Create a task that extends the predefined task
+        local base_task = vim.deepcopy(predefined.get(predefined_id))
+        -- Generate a local ID by replacing colons with hyphens
+        local local_id = predefined_id:gsub(":", "-")
+        result[local_id] = base_task
+      else
+        vim.notify("Unknown predefined task: " .. id, vim.log.levels.WARN)
+      end
+    -- Handle regular tasks without 'extend'
+    elseif task ~= false and not task.extend then
       result[id] = vim.deepcopy(task)
     end
   end
   
   -- Second pass: process tasks with 'extend'
   for id, task in pairs(tasks) do
-    if task ~= false and task.extend then
+    if type(task) == "table" and task.extend then
       -- Find the base task
       local base_task = nil
       
