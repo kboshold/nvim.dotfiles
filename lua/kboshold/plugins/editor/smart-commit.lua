@@ -1,6 +1,6 @@
 return {
   "kboshold/smart-commit.nvim",
-  -- dir = "/home/kboshold/workspace/config/smart-commit.nvim",
+  dir = "/home/kboshold/workspace/config/smart-commit.nvim",
   name = "smart-commit",
   lazy = false,
   dependencies = {
