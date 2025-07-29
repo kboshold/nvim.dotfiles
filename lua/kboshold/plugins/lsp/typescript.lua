@@ -23,7 +23,7 @@ if USE_TYPESCRIPT_TOOLS then
       opts = {
         filetypes = {
           "javascript",
-          "javascriptreact", 
+          "javascriptreact",
           "typescript",
           "typescriptreact",
           -- Removed "vue" - let Volar handle Vue files
@@ -38,12 +38,12 @@ if USE_TYPESCRIPT_TOOLS then
           code_lens = "off",
           disable_member_code_lens = true,
           single_file_support = false,
-          
+
           -- Remove Vue TypeScript plugin since we're not handling Vue files
           -- tsserver_plugins = {
           --   "@vue/typescript-plugin",
           -- },
-          
+
           tsserver_file_preferences = {
             includeInlayParameterNameHints = "literals",
             includeInlayParameterNameHintsWhenArgumentMatchesName = false,
@@ -55,7 +55,7 @@ if USE_TYPESCRIPT_TOOLS then
             includeCompletionsForModuleExports = true,
             includeCompletionsForImportStatements = true,
           },
-          
+
           jsx_close_tag = {
             enable = true,
             filetypes = { "javascriptreact", "typescriptreact" },
@@ -64,7 +64,7 @@ if USE_TYPESCRIPT_TOOLS then
       },
       config = function(_, opts)
         require("typescript-tools").setup(opts)
-        
+
         -- Keymaps for TypeScript/JavaScript/Vue files
         local function map(mode, lhs, rhs, desc)
           vim.keymap.set(mode, lhs, rhs, { desc = desc, buffer = true })
@@ -101,7 +101,7 @@ else
   return {
     -- Import TypeScript extra
     { import = "lazyvim.plugins.extras.lang.typescript" },
-    
+
     -- Disable typescript-tools
     {
       "pmizio/typescript-tools.nvim",
