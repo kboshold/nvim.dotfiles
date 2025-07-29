@@ -1,11 +1,10 @@
--- Toggle between vtsls and typescript-tools
+-- TypeScript/JavaScript support with typescript-tools
 -- Set this flag to choose your TypeScript LSP server
 local USE_TYPESCRIPT_TOOLS = true -- Set to false to use vtsls instead
 
 if USE_TYPESCRIPT_TOOLS then
-  -- TypeScript Tools Configuration
   return {
-    -- Disable vtsls when using typescript-tools
+    -- Disable vtsls completely
     {
       "neovim/nvim-lspconfig",
       opts = {
@@ -16,12 +15,19 @@ if USE_TYPESCRIPT_TOOLS then
       },
     },
 
-    -- Enable typescript-tools
+    -- Enable typescript-tools for TS/JS files only (NOT Vue)
     {
       "pmizio/typescript-tools.nvim",
       dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
-      ft = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
+      ft = { "typescript", "typescriptreact", "javascript", "javascriptreact" }, -- Removed "vue"
       opts = {
+        filetypes = {
+          "javascript",
+          "javascriptreact", 
+          "typescript",
+          "typescriptreact",
+          -- Removed "vue" - let Volar handle Vue files
+        },
         settings = {
           separate_diagnostic_server = true,
           publish_diagnostic_on = "insert_leave",
@@ -31,18 +37,25 @@ if USE_TYPESCRIPT_TOOLS then
           include_completions_with_insert_text = true,
           code_lens = "off",
           disable_member_code_lens = true,
-
-          -- Inlay hints
+          single_file_support = false,
+          
+          -- Remove Vue TypeScript plugin since we're not handling Vue files
+          -- tsserver_plugins = {
+          --   "@vue/typescript-plugin",
+          -- },
+          
           tsserver_file_preferences = {
-            includeInlayParameterNameHints = "all",
+            includeInlayParameterNameHints = "literals",
             includeInlayParameterNameHintsWhenArgumentMatchesName = false,
             includeInlayFunctionParameterTypeHints = true,
-            includeInlayVariableTypeHints = true,
+            includeInlayVariableTypeHints = false,
             includeInlayPropertyDeclarationTypeHints = true,
             includeInlayFunctionLikeReturnTypeHints = true,
             includeInlayEnumMemberValueHints = true,
+            includeCompletionsForModuleExports = true,
+            includeCompletionsForImportStatements = true,
           },
-
+          
           jsx_close_tag = {
             enable = true,
             filetypes = { "javascriptreact", "typescriptreact" },
@@ -51,14 +64,14 @@ if USE_TYPESCRIPT_TOOLS then
       },
       config = function(_, opts)
         require("typescript-tools").setup(opts)
-
-        -- TypeScript Tools specific keymaps
+        
+        -- Keymaps for TypeScript/JavaScript/Vue files
         local function map(mode, lhs, rhs, desc)
           vim.keymap.set(mode, lhs, rhs, { desc = desc, buffer = true })
         end
 
         vim.api.nvim_create_autocmd("FileType", {
-          pattern = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
+          pattern = { "typescript", "typescriptreact", "javascript", "javascriptreact" }, -- Removed "vue"
           callback = function()
             map("n", "<leader>cto", "<cmd>TSToolsOrganizeImports<cr>", "Organize Imports")
             map("n", "<leader>ctu", "<cmd>TSToolsRemoveUnused<cr>", "Remove Unused")
@@ -73,56 +86,35 @@ if USE_TYPESCRIPT_TOOLS then
         })
       end,
     },
+
+    -- TreeSitter support for TypeScript/JavaScript
+    {
+      "nvim-treesitter/nvim-treesitter",
+      opts = function(_, opts)
+        opts.ensure_installed = opts.ensure_installed or {}
+        vim.list_extend(opts.ensure_installed, { "typescript", "javascript", "tsx", "jsx" })
+      end,
+    },
   }
 else
-  -- vtsls Configuration (LazyVim default)
+  -- vtsls configuration
   return {
-    -- Re-enable the TypeScript extra
+    -- Import TypeScript extra
     { import = "lazyvim.plugins.extras.lang.typescript" },
-
-    -- Ensure typescript-tools is disabled
+    
+    -- Disable typescript-tools
     {
       "pmizio/typescript-tools.nvim",
       enabled = false,
     },
 
-    -- Optional: Custom vtsls configuration
+    -- TreeSitter support
     {
-      "neovim/nvim-lspconfig",
-      opts = {
-        servers = {
-          vtsls = {
-            enabled = true,
-            -- Add any custom vtsls settings here
-            settings = {
-              complete_function_calls = true,
-              vtsls = {
-                enableMoveToFileCodeAction = true,
-                autoUseWorkspaceTsdk = true,
-                experimental = {
-                  completion = {
-                    enableServerSideFuzzyMatch = true,
-                  },
-                },
-              },
-              typescript = {
-                updateImportsOnFileMove = { enabled = "always" },
-                suggest = {
-                  completeFunctionCalls = true,
-                },
-                inlayHints = {
-                  enumMemberValues = { enabled = true },
-                  functionLikeReturnTypes = { enabled = true },
-                  parameterNames = { enabled = "literals" },
-                  parameterTypes = { enabled = true },
-                  propertyDeclarationTypes = { enabled = true },
-                  variableTypes = { enabled = false },
-                },
-              },
-            },
-          },
-        },
-      },
+      "nvim-treesitter/nvim-treesitter",
+      opts = function(_, opts)
+        opts.ensure_installed = opts.ensure_installed or {}
+        vim.list_extend(opts.ensure_installed, { "typescript", "javascript", "tsx", "jsx" })
+      end,
     },
   }
 end

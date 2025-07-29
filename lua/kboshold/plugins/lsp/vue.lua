@@ -1,45 +1,49 @@
+-- Vue.js support with Volar 3 (Take Over Mode)
 return {
-  recommended = function()
-    return LazyVim.extras.wants({
-      ft = "vue",
-      root = { "vue.config.js" },
-    })
-  end,
-
-  -- Remove dependency on typescript extra since we're using typescript-tools
-  -- { import = "lazyvim.plugins.extras.lang.typescript" },
-
+  -- TreeSitter support for Vue
   {
     "nvim-treesitter/nvim-treesitter",
-    opts = { ensure_installed = { "vue", "css" } },
+    opts = function(_, opts)
+      opts.ensure_installed = opts.ensure_installed or {}
+      vim.list_extend(opts.ensure_installed, { "vue", "css", "html" })
+    end,
   },
 
-  -- Add LSP servers
+  -- Volar LSP for Vue files (Take Over Mode - handles both Vue and TypeScript)
   {
     "neovim/nvim-lspconfig",
+    ft = { "vue" },
     opts = {
       servers = {
         volar = {
-          -- Use Volar in Take Over Mode for better Vue + TypeScript integration
-          -- This works with typescript-tools running separately
+          filetypes = { "vue" },
           init_options = {
             vue = {
-              hybridMode = false, -- Set to false for Take Over Mode
+              hybridMode = false, -- Take Over Mode - Volar handles TypeScript in Vue files
             },
             typescript = {
               tsdk = vim.fn.getcwd() .. "/node_modules/typescript/lib",
             },
           },
-          -- Remove the vtsls-specific handler since we're using typescript-tools
-          filetypes = { "vue" },
+          on_new_config = function(new_config, new_root_dir)
+            -- Dynamically set TypeScript SDK path for each project
+            local tsdk_path = new_root_dir .. "/node_modules/typescript/lib"
+            if vim.fn.isdirectory(tsdk_path) == 1 then
+              new_config.init_options.typescript.tsdk = tsdk_path
+            end
+          end,
+          -- Volar 3 handles all Vue file features including TypeScript
+          settings = {
+            vue = {
+              inlayHints = {
+                missingProps = true,
+                inlineHandlerLeading = true,
+                optionsWrapper = true,
+              },
+            },
+          },
         },
       },
     },
-  },
-
-  -- Ensure typescript-tools is loaded for Vue files that contain TypeScript
-  {
-    "pmizio/typescript-tools.nvim",
-    ft = { "vue" }, -- Add vue to filetypes so it loads for Vue files too
   },
 }
