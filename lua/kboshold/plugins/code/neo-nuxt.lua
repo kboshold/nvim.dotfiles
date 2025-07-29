@@ -1,8 +1,12 @@
+if true then
+  return {}
+end
 return {
   {
     "kboshold/neo-nuxt.nvim",
     dir = "/home/kboshold/workspace/config/neo-nuxt.nvim",
     name = "neo-nuxt",
+    enable = false,
     lazy = false,
     config = function()
       require("neo-nuxt").setup({
