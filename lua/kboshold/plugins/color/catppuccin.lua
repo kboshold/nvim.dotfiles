@@ -21,6 +21,7 @@ return {
       leap = true,
       lsp_trouble = true,
       mason = true,
+      diffview = true,
       markdown = true,
       mini = true,
       native_lsp = {
@@ -79,7 +80,7 @@ return {
         CmpPmenu = { bg = colors.base, fg = colors.text },
         CmpSel = { bg = colors.blue, fg = colors.mantle, bold = true },
 
-        CursorLine = { bg = util.color.lighten(colors.base, 0.02) },
+        CursorLine = { bg = util.color.interpolate(colors.base, colors.lavender, 0.96) },
         ColorColumnBlue = { fg = util.color.interpolate(colors.base, colors.blue, 0.98) },
         ColorColumnRed = { fg = util.color.interpolate(colors.base, colors.red, 0.98) },
 
@@ -91,6 +92,16 @@ return {
         SmartCommitStatusSuccess = { fg = colors.green },
         SmartCommitStatusError = { fg = colors.red },
         SmartCommitDivider = { fg = colors.overlay1 },
+
+        DiffAdd = { bg = util.color.interpolate(colors.base, colors.green, 0.92) },
+        DiffDelete = {
+          bg = util.color.interpolate(colors.base, colors.red, 0.98),
+          fg = util.color.interpolate(colors.base, colors.red, 0.92),
+        },
+        DiffChange = { bg = util.color.interpolate(colors.base, colors.mauve, 0.9) },
+        DiffText = { bg = util.color.interpolate(colors.base, colors.mauve, 0.75) },
+
+        Folded = { bg = util.color.interpolate(colors.base, colors.sapphire, 0.92) },
       }
 
       for _, accent in ipairs(accents) do
