@@ -9,6 +9,7 @@ if vim.fn.has("nvim-0.10.0") == 0 then
 end
 
 require("kboshold.config.options")
+require("kboshold.config.cmds")
 require("kboshold.config.autocmds")
 require("kboshold.config.lazy")
 require("kboshold.config.keymaps")
