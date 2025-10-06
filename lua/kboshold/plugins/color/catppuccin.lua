@@ -1,7 +1,6 @@
 return {
   "catppuccin/nvim",
   lazy = true,
-  tag = "v1.10.0",
   name = "catppuccin",
   opts = {
     flavour = "mocha",
@@ -123,8 +122,7 @@ return {
       optional = true,
       opts = function(_, opts)
         if (vim.g.colors_name or ""):find("catppuccin") then
-          -- opts.highlights = require("catppuccin.groups.integrations.bufferline").get_theme()
-          opts.highlights = require("catppuccin.groups.integrations.bufferline").get()
+          opts.highlights = require("catppuccin.special.bufferline").get_theme()
         end
       end,
     },
