@@ -70,32 +70,5 @@ return {
     if vim.o.columns > 158 then
       vim.api.nvim_create_autocmd({ "BufEnter" }, { callback = on_buf_enter })
     end
-
-    -- toggle neotree on resize
-    local old_size = vim.o.columns
-    local explorer_size = 158
-    local function on_resized()
-      if old_size < explorer_size and vim.o.columns >= explorer_size then
-        Snacks.explorer({ focus = false })
-      end
-
-      if old_size >= explorer_size and vim.o.columns < explorer_size then
-        local picker = Snacks.explorer()
-        if picker ~= nil then
-          picker:close()
-        end
-      end
-
-      old_size = vim.o.columns
-    end
-
-    vim.api.nvim_create_autocmd("VimResized", {
-      pattern = "*",
-      group = vim.api.nvim_create_augroup("NvimTreeResize", { clear = true }),
-      callback = function()
-        -- Run deferred since it will show the wrong layout otherwise
-        vim.defer_fn(on_resized, 10)
-      end,
-    })
   end,
 }

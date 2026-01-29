@@ -39,33 +39,3 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.conceallevel = 0
   end,
 })
-
--- Smart Commit sign definitions
--- vim.api.nvim_create_autocmd("VimEnter", {
---   callback = function()
---     -- Define signs for Smart Commit task status
---     vim.fn.sign_define("SmartCommitPending", {
---       text = "○",
---       texthl = "Comment",
---       numhl = "Comment",
---     })
---
---     vim.fn.sign_define("SmartCommitRunning", {
---       text = "●",
---       texthl = "DiagnosticInfo",
---       numhl = "DiagnosticInfo",
---     })
---
---     vim.fn.sign_define("SmartCommitSuccess", {
---       text = "✓",
---       texthl = "DiagnosticOk",
---       numhl = "DiagnosticOk",
---     })
---
---     vim.fn.sign_define("SmartCommitFailed", {
---       text = "✗",
---       texthl = "DiagnosticError",
---       numhl = "DiagnosticError",
---     })
---   end,
--- })
