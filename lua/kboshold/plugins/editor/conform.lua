@@ -17,28 +17,17 @@ return {
   "stevearc/conform.nvim",
   opts = {
     formatters_by_ft = {
-      -- vue = { "eslint_d", "eslint", lsp_format = "fallack" },
-      -- javascript = { "eslint_d", "eslint", lsp_format = "fallack" },
-      -- javascriptreact = { "eslint_d", "eslint", lsp_format = "fallack" },
-      -- typescript = { "eslint_d", "eslint", lsp_format = "fallack" },
-      -- typescriptreact = { "eslint_d", "eslint", lsp_format = "fallack" },
-      vue = { "eslint_d", lsp_format = "fallack" },
-      javascript = { "eslint_d", lsp_format = "fallack" },
-      javascriptreact = { "eslint_d", lsp_format = "fallack" },
-      typescript = { "eslint_d", lsp_format = "fallack" },
-      typescriptreact = { "eslint_d", lsp_format = "fallack" },
+      vue = { "eslint_d", lsp_format = "fallback" },
+      javascript = { "eslint_d", lsp_format = "fallback" },
+      javascriptreact = { "eslint_d", lsp_format = "fallback" },
+      typescript = { "eslint_d", lsp_format = "fallback" },
+      typescriptreact = { "eslint_d", lsp_format = "fallback" },
       prisma = { "prisma", lsp_format = "fallback" },
       json = { "jsonsort", lsp_format = "first" },
       nix = { "alejandra", lsp_format = "fallback" },
       lua = { "stylua", lsp_format = "fallback" },
     },
     formatters = {
-      eslint = {
-        command = from_node_modules("eslint"),
-        args = { "--fix", "$FILENAME" },
-        stdin = true,
-        cwd = require("conform.util").root_file({ "package.json" }),
-      },
       eslint_d = {
         command = from_node_modules("eslint_d"),
         args = { "--fix-to-stdout", "--stdin", "--stdin-filename", "$FILENAME" },
