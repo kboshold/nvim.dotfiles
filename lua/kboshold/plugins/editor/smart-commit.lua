@@ -2,7 +2,7 @@ return {
   "kboshold/smart-commit.nvim",
   dir = "/home/kboshold/workspace/config/smart-commit.nvim",
   name = "smart-commit",
-  lazy = true,
+  lazy = false,
   dependencies = {
     "nvim-lua/plenary.nvim",
     "CopilotC-Nvim/CopilotChat.nvim", -- Required for commit message generation

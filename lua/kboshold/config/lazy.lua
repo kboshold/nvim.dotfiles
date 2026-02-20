@@ -17,7 +17,6 @@ require("lazy").setup({
     { import = "kboshold.plugins.code" },
     { import = "kboshold.plugins.editor" },
     { import = "kboshold.plugins.ui" },
-    { import = "kboshold.plugins.util" },
     { import = "kboshold.plugins.lsp" },
     { import = "kboshold.plugins.navigation" },
     { import = "kboshold.plugins.lazy" },
