@@ -13,6 +13,3 @@ require("kboshold.config.cmds")
 require("kboshold.config.autocmds")
 require("kboshold.config.lazy")
 require("kboshold.config.keymaps")
-require("kboshold.config.features")
-
--- vim.cmd [[colorscheme catppuccin]]

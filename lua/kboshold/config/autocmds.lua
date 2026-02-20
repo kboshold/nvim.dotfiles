@@ -5,9 +5,14 @@ vim.api.nvim_create_autocmd("StdinReadPost", {
   end,
 })
 
--- Change the color or the CursorLineNr depending on the mode
+-- Change the color of CursorLineNr depending on the mode
+local last_mode_suffix = nil
 local function update_cursor_line_nr()
   local suffix = require("lualine.highlight").get_mode_suffix()
+  if suffix == last_mode_suffix then
+    return
+  end
+  last_mode_suffix = suffix
 
   local cursor_line_hl = vim.api.nvim_get_hl(0, {
     name = "CursorLine",
@@ -30,7 +35,10 @@ vim.api.nvim_create_autocmd("ModeChanged", {
   callback = update_cursor_line_nr,
 })
 vim.api.nvim_create_autocmd("BufEnter", {
-  callback = update_cursor_line_nr,
+  callback = function()
+    last_mode_suffix = nil
+    update_cursor_line_nr()
+  end,
 })
 
 vim.api.nvim_create_autocmd("FileType", {
