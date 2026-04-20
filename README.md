@@ -1,6 +1,6 @@
 <div align='center'>
    <p>
-      <a href="https://github.com/kboshold/nvim.dotfiles#is=awesome">
+      <a href="https://github.com/kboshold/nvim.dotfiles">
          <picture>
             <source media="(prefers-color-scheme: dark)" type="image/svg+xml" srcset="./docs/assets/logo_dark.svg">
             <img alt="Logo with the Lettering Neovim and a lazy ninja on the left" src="./docs/assets/logo_light.svg">
@@ -14,13 +14,13 @@
             <img src="https://img.shields.io/github/license/kboshold/nvim.dotfiles.svg?color=8839ef" alt="MIT License"/>
          </picture>
       </a>
-      <a href="https://github.com/neovim/neovim#is-also-awesome">
+      <a href="https://github.com/neovim/neovim">
          <picture>
             <source media="(prefers-color-scheme: dark)" type="image/svg+xml" srcset="https://img.shields.io/badge/%3E%3D0.11.0-a6e3a1?logo=neovim&label=neovim&labelColor=74c7ec&logoColor=313244">
             <img alt="Neovim 0.11 is required" src="https://img.shields.io/badge/%3E%3D0.11.0-40a02b?logo=neovim&label=neovim&labelColor=1e66f5">
          </picture>
        </a>
-      <a href="https://github.com/neovim/neovim#0.12-is-also-awesome">
+      <a href="https://github.com/neovim/neovim/releases/tag/v0.12.0">
          <picture>
             <source media="(prefers-color-scheme: dark)" type="image/svg+xml" srcset="https://img.shields.io/badge/0.12.0-a6e3a1?logo=neovim&label=neovim&labelColor=74c7ec&logoColor=313244">
             <img alt="Neovim 0.12 is supported" src="https://img.shields.io/badge/0.12.0-40a02b?logo=neovim&label=neovim&labelColor=1e66f5">
@@ -40,9 +40,9 @@
 
 | Tool       | Version   | Usage                                                                                 | Note                                                                                                      |
 | ---------- | --------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| Neovim     | >= 0.11.0 | <img src="https://img.shields.io/badge/required-f491ac?style=flat" alt="Required"/>   | [Installation Guide](https://github.com/neovim/neovim/blob/master/INSTALL.md#is-also-awesome)             |
-| Git        | >= 2.19.0 | <img src="https://img.shields.io/badge/required-f491ac?style=flat" alt="Required"/>   | [Download](https://git-scm.com/downloads#is-also-awesome)                                                 |
-| NerdFont   | -         | <img src="https://img.shields.io/badge/suggested-cba6f7?style=flat" alt="Suggested"/> | [Download](https://www.nerdfonts.com/font-downloads#is-also-awesome) (i.e. `JetBrainsMono Nerd Font`)     |
+| Neovim     | >= 0.11.0 | <img src="https://img.shields.io/badge/required-f491ac?style=flat" alt="Required"/>   | [Installation Guide](https://github.com/neovim/neovim/blob/master/INSTALL.md)             |
+| Git        | >= 2.19.0 | <img src="https://img.shields.io/badge/required-f491ac?style=flat" alt="Required"/>   | [Download](https://git-scm.com/downloads)                                                 |
+| NerdFont   | -         | <img src="https://img.shields.io/badge/suggested-cba6f7?style=flat" alt="Suggested"/> | [Download](https://www.nerdfonts.com/font-downloads) (i.e. `JetBrainsMono Nerd Font`)     |
 | C Compiler | -         | <img src="https://img.shields.io/badge/suggested-cba6f7?style=flat" alt="Suggested"/> | See [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter?tab=readme-ov-file#requirements) |
 | ripgrep    | >= 14.1.0 | <img src="https://img.shields.io/badge/suggested-cba6f7?style=flat" alt="Suggested"/> | [Installation](https://github.com/BurntSushi/ripgrep?tab=readme-ov-file#installation)                     |
 | fd         | >= 10.1.0 | <img src="https://img.shields.io/badge/suggested-cba6f7?style=flat" alt="Suggested"/> | [Installation](https://github.com/sharkdp/fd?tab=readme-ov-file#installation)                             |
@@ -118,21 +118,19 @@ Built on [LazyVim](https://www.lazyvim.org/). Below is the stuff on top.
 
 | Mapping | Mode | Description |
 | ------- | ---- | ----------- |
-| `dih` / `cih` / `vih` | n | Delete / change / select the treesitter node under cursor |
-| `gf` | n | Open file under cursor; supports `file.lua:10` and `file.lua:10-20` ranges |
-| `<leader>e` | n | Toggle snacks file explorer (reuses existing pane if open) |
-| `<leader>oo` | n | Open Oil file browser |
-| `<leader>od` | n | Oil floating preview |
+| `dih` / `cih` / `vih` | n | Delete / change / select the TS node at cursor |
+| `gf` | n | Open file under cursor; supports `:line` and `:line-line` suffix |
+| `<leader>e` | n | Toggle snacks explorer (reuses open pane) |
+| `<leader>oo` / `<leader>od` | n | Oil browser / floating preview |
 | `<leader>sc` | n | Toggle smart-commit status window |
-| `<leader>gdm` | n | Diff current branch vs `origin/main` |
-| `<leader>gds` | n | Diff uncommitted changes |
+| `<leader>gdm` / `<leader>gds` | n | Diffview: branch vs `origin/main` / uncommitted |
 | `<leader>um` | n | Toggle render-markdown |
-| `<leader>aa` / `<leader>as` | n | Sidekick: toggle CLI / select CLI |
-| `<leader>at` / `<leader>av` | n / x | Send current node / visual selection to Sidekick |
+| `<leader>aa` / `as` | n | Sidekick: toggle CLI / select CLI |
+| `<leader>at` / `av` | n / x | Send current node / selection to Sidekick |
 | `<leader>ap` | n / x | Sidekick prompt picker |
 | `<leader>ac` | n | Toggle Sidekick Claude |
-| `<C-.>` | n / x / i / t | Switch focus to Sidekick |
-| `<Tab>` | i | Apply next-edit suggestion (Sidekick); falls back to `<Tab>` |
+| `<C-.>` | any | Switch focus to Sidekick |
+| `<Tab>` | i | Apply next-edit suggestion; falls back to `<Tab>` |
 | `<C-h/j/k/l>` / `<C-\>` | n | Tmux-aware pane navigation |
 
 ### 🧰 Custom commands
