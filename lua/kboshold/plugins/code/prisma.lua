@@ -1,6 +1,4 @@
 return {
-  {
-    "prisma/vim-prisma",
-    ft = "prisma",
-  },
+  "prisma/vim-prisma",
+  ft = "prisma",
 }

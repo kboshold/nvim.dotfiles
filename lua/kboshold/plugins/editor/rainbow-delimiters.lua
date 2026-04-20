@@ -1,5 +1,7 @@
 return {
   "hiphish/rainbow-delimiters.nvim",
+  event = { "BufReadPost", "BufNewFile" },
+  main = "rainbow-delimiters.setup",
   opts = {
     strategy = {
       [""] = "rainbow-delimiters.strategy.global",
@@ -23,7 +25,4 @@ return {
       "RainbowDelimiterCyan",
     },
   },
-  config = function(_, opts)
-    require("rainbow-delimiters.setup").setup(opts)
-  end,
 }

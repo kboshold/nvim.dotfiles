@@ -1,57 +1,60 @@
 return {
   "stevearc/oil.nvim",
-  -- Optional dependencies
   dependencies = {
     "nvim-tree/nvim-web-devicons",
   },
-
-  config = function()
+  cmd = "Oil",
+  opts = {
+    default_file_explorer = false,
+    delete_to_trash = true,
+    view_options = {
+      show_hidden = true,
+    },
+    float = {
+      padding = 2,
+      max_width = 140,
+      max_height = 50,
+      preview_split = "right",
+    },
+  },
+  keys = {
+    {
+      "<leader>oo",
+      function()
+        require("oil").open()
+      end,
+      desc = "Oil",
+    },
+    {
+      "<leader>od",
+      function()
+        local oil = require("oil")
+        oil.toggle_float()
+        -- using OilEnter does not work quite well
+        vim.defer_fn(function()
+          oil.open_preview()
+        end, 50)
+      end,
+      desc = "Oil Preview",
+    },
+  },
+  config = function(_, opts)
     local oil = require("oil")
-
-    oil.setup({
-      default_file_explorer = false,
-      delete_to_trash = true,
-      view_options = {
-        show_hidden = true,
-      },
-      float = {
-        padding = 2,
-        max_width = 140,
-        max_height = 50,
-        preview_split = "right",
-      },
-    })
-
-    vim.keymap.set("n", "<leader>oo", function()
-      oil.open()
-    end, {})
-
-    -- keymap
-    local open_preview = false
-    vim.keymap.set("n", "<leader>od", function()
-      open_preview = true
-      oil.toggle_float()
-
-      -- using OilEnter does not work quite well
-      vim.defer_fn(function()
-        oil.open_preview()
-      end, 50)
-    end, {})
+    oil.setup(opts)
 
     -- autocmd to have additional keymaps for preview
     vim.api.nvim_create_autocmd("FileType", {
       pattern = "oil",
       callback = function()
         if vim.api.nvim_win_get_config(0).relative ~= "" then -- Check if the window is floating
-          local opts = { noremap = true, silent = true, buffer = true }
+          local bufopts = { noremap = true, silent = true, buffer = true }
 
-          vim.keymap.set("n", "q", oil.toggle_float, opts)
-          vim.keymap.set("n", "<ESC>", oil.toggle_float, opts)
+          vim.keymap.set("n", "q", oil.toggle_float, bufopts)
+          vim.keymap.set("n", "<ESC>", oil.toggle_float, bufopts)
 
-          -- todo: fix issue with neotree
           vim.keymap.set("n", "<CR>", function()
-            oil.select({}, function(err) end)
-          end, opts)
+            oil.select({}, function(_) end)
+          end, bufopts)
         end
       end,
     })

@@ -9,8 +9,6 @@ assign(vim.g, {
   -- defaults
   ux_piped_input = 0,
 
-  -- lazy defaults
-  lazyvim_cmp = "blink.cmp",
   ai_cmp = true,
 })
 -- assign options
