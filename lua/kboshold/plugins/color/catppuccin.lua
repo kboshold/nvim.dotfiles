@@ -19,6 +19,7 @@ return {
       indent_blankline = { enabled = true },
       leap = true,
       lsp_trouble = true,
+      mason = true,
       diffview = true,
       markdown = true,
       mini = true,
