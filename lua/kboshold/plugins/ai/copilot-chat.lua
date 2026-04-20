@@ -1,5 +1,6 @@
 return {
   "CopilotC-Nvim/CopilotChat.nvim",
+  cmd = { "CopilotChat", "CopilotChatToggle", "CopilotChatOpen" },
   opts = {
     model = "gpt-4.1",
     show_help = false,
@@ -11,7 +12,7 @@ return {
   config = function(_, opts)
     local chat = require("CopilotChat")
 
-    vim.api.nvim_create_autocmd("BufEnter", {
+    vim.api.nvim_create_autocmd("FileType", {
       pattern = "copilot-chat",
       callback = function()
         vim.opt_local.relativenumber = true

@@ -29,8 +29,9 @@ M.color.lighten = function(color, ratio)
   return rgb_to_hex(r, g, b)
 end
 
+-- Interpolate between two colors. `ratio` weights the first arg:
+-- ratio=1 returns `base`, ratio=0 returns `accent`.
 M.color.interpolate = function(base, accent, ratio)
-  -- Interpoliere zwischen den beiden Farben basierend auf dem Verhältnis
   local base_r, base_g, base_b = hex_to_rgb(base)
   local accent_r, accent_g, accent_b = hex_to_rgb(accent)
   local interpolated_r = math.floor(base_r * ratio + accent_r * (1 - ratio))

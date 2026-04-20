@@ -1,10 +1,9 @@
--- if true then return {} end
-
 return {
   "nvim-lualine/lualine.nvim",
   event = "VeryLazy",
   dependencies = {
     "nvim-tree/nvim-web-devicons",
+    "catppuccin",
   },
   init = function()
     vim.g.lualine_laststatus = vim.o.laststatus

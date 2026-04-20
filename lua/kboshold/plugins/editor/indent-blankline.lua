@@ -1,8 +1,8 @@
 return {
   "lukas-reineke/indent-blankline.nvim",
   main = "ibl",
-  event = "BufEnter",
-  config = function()
+  event = "LazyFile",
+  opts = function()
     local colors = {
       "Mauve",
       "Blue",
@@ -23,7 +23,7 @@ return {
       scope_highlights[i] = "IndentScope" .. value
     end
 
-    require("ibl").setup({
+    return {
       scope = {
         char = "▏",
         highlight = scope_highlights,
@@ -40,6 +40,6 @@ return {
         highlight = indent_highlights,
         remove_blankline_trail = false,
       },
-    })
+    }
   end,
 }

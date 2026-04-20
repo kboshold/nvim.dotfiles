@@ -8,7 +8,11 @@ vim.api.nvim_create_autocmd("StdinReadPost", {
 -- Change the color of CursorLineNr depending on the mode
 local last_mode_suffix = nil
 local function update_cursor_line_nr()
-  local suffix = require("lualine.highlight").get_mode_suffix()
+  local ok, hl = pcall(require, "lualine.highlight")
+  if not ok then
+    return
+  end
+  local suffix = hl.get_mode_suffix()
   if suffix == last_mode_suffix then
     return
   end

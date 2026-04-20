@@ -55,17 +55,17 @@ vim.keymap.set("n", "gf", function()
     start_index = found_end + 1
   end
 
-  vim.cmd("e " .. file)
+  vim.cmd.edit(vim.fn.fnameescape(file))
 
   if found_end then
     local text_after = string.sub(line_content, found_end + 1)
     local line_start, _, line_end = string.match(text_after, "^:(%d+)(%-?(%d*))")
     if line_start then
       vim.cmd(line_start)
-    end
 
-    if line_end and line_end > 0 then
-      vim.cmd("normal! V" .. line_end .. "G")
+      if line_end and line_end ~= "" and tonumber(line_end) and tonumber(line_end) > 0 then
+        vim.cmd("normal! V" .. line_end .. "G")
+      end
     end
   end
 end, { desc = "Open file at position" })

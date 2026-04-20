@@ -1,5 +1,6 @@
 return {
   "MeanderingProgrammer/render-markdown.nvim",
+  dependencies = { "folke/snacks.nvim" },
   ft = { "markdown", "copilot-chat" },
   opts = {
     code = {
