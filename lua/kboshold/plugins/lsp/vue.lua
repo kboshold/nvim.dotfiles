@@ -1,14 +1,4 @@
 return {
-  recommended = function()
-    return LazyVim.extras.wants({
-      ft = "vue",
-      root = { "vue.config.js" },
-    })
-  end,
-
-  -- depends on the typescript extra
-  { import = "lazyvim.plugins.extras.lang.typescript" },
-
   {
     "nvim-treesitter/nvim-treesitter",
     opts = { ensure_installed = { "vue", "css" } },
@@ -37,8 +27,14 @@ return {
               end
               local ts_client = clients[1]
 
-              local param = unpack(result)
+              local param = unpack(result or {})
+              if not param then
+                return
+              end
               local id, command, payload = unpack(param)
+              if not id then
+                return
+              end
               ts_client:exec_cmd({
                 command = "typescript.tsserverRequest",
                 arguments = {
@@ -62,6 +58,8 @@ return {
   {
     "neovim/nvim-lspconfig",
     opts = function(_, opts)
+      opts.servers.vtsls.filetypes = opts.servers.vtsls.filetypes
+        or { "typescript", "javascript", "javascriptreact", "typescriptreact" }
       table.insert(opts.servers.vtsls.filetypes, "vue")
       LazyVim.extend(opts.servers.vtsls, "settings.vtsls.tsserver.globalPlugins", {
         {
