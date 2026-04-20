@@ -42,8 +42,8 @@ vim.keymap.set("n", "gf", function()
   local start_index = 1
   local found_start = nil
   local found_end = nil
-  while true do
-    found_start, found_end = string.find(line_content, file, start_index)
+  for _ = 1, 20 do
+    found_start, found_end = string.find(line_content, file, start_index, true)
     if not found_start then
       break
     end

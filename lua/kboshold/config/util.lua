@@ -7,6 +7,9 @@ local function rgb_to_hex(r, g, b)
 end
 
 local function hex_to_rgb(hex)
+  if type(hex) ~= "string" or not hex:match("^#%x%x%x%x%x%x$") then
+    return 0, 0, 0
+  end
   local r = tonumber(hex:sub(2, 3), 16)
   local g = tonumber(hex:sub(4, 5), 16)
   local b = tonumber(hex:sub(6, 7), 16)

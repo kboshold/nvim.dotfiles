@@ -134,12 +134,11 @@ return {
             function()
               local bufnr = vim.api.nvim_get_current_buf()
               local clients = vim.lsp.get_clients({ bufnr = bufnr })
-              if clients == nil then
+              if #clients == 0 then
                 return ""
               end
 
               local icons = {
-                [0] = "",
                 [1] = "󰇊",
                 [2] = "󰇋",
                 [3] = "󰇌",
@@ -147,7 +146,7 @@ return {
                 [5] = "󰇎",
                 [6] = "󰇏",
               }
-              return icons[#clients] or ""
+              return icons[math.min(#clients, 6)] or ""
             end,
             color = { fg = mocha.blue },
             padding = { left = 0, right = 1 },

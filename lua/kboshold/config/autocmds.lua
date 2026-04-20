@@ -1,5 +1,8 @@
+local group = vim.api.nvim_create_augroup("kboshold", { clear = true })
+
 -- Set ux_piped_input to `1` for input streams
 vim.api.nvim_create_autocmd("StdinReadPost", {
+  group = group,
   callback = function()
     vim.g.ux_piped_input = 1
   end,
@@ -36,9 +39,11 @@ local function update_cursor_line_nr()
 end
 
 vim.api.nvim_create_autocmd("ModeChanged", {
+  group = group,
   callback = update_cursor_line_nr,
 })
 vim.api.nvim_create_autocmd("BufEnter", {
+  group = group,
   callback = function()
     last_mode_suffix = nil
     update_cursor_line_nr()
@@ -46,6 +51,7 @@ vim.api.nvim_create_autocmd("BufEnter", {
 })
 
 vim.api.nvim_create_autocmd("FileType", {
+  group = group,
   pattern = "markdown",
   callback = function()
     vim.opt_local.conceallevel = 0
