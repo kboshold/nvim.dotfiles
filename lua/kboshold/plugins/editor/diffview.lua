@@ -19,5 +19,13 @@ return {
       end,
       desc = "Diff: uncommitted changes",
     },
+    -- Diff commits ahead of upstream
+    {
+      "<leader>gdu",
+      function()
+        require("diffview").open({ "@{u}..HEAD" })
+      end,
+      desc = "Diff: commits ahead of upstream",
+    },
   },
 }
