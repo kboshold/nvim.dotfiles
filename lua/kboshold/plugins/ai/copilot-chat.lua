@@ -1,5 +1,6 @@
 return {
   "CopilotC-Nvim/CopilotChat.nvim",
+  enabled = false,
   cmd = { "CopilotChat", "CopilotChatToggle", "CopilotChatOpen" },
   main = "CopilotChat",
   init = function()

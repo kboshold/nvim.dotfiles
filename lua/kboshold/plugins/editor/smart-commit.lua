@@ -1,5 +1,6 @@
 return {
   "kboshold/smart-commit.nvim",
+  enabled = false,
   dir = vim.fn.expand("~/workspace/config/smart-commit.nvim/main"),
   name = "smart-commit",
   lazy = false,
