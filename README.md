@@ -145,4 +145,8 @@ Built on [LazyVim](https://www.lazyvim.org/). Below is the stuff on top.
 
 `scripts/check.sh` runs Neovim headless and reports startup time, LSP clients per sample file, notify errors and `:checkhealth` problems. It uses `NVIM_APPNAME=nvim-opt` by default (symlink `~/.config/nvim-opt` to this repo); `scripts/install.lua` installs mason tools and parsers in that isolated instance.
 
+`scripts/smoke.lua` is a lighter check (config loads, no errors) that CI runs on every push and PR together with `stylua --check`.
+
+Markdown linting uses `.markdownlint-cli2.yaml` as base config (MD013, MD033, MD041 off) and skips Claude/Codex Ctrl+G prompt files. tailwindcss only starts in projects with a Tailwind/PostCSS config or a `tailwindcss` dependency.
+
 Use `:InspectTree` (built in) to inspect the treesitter tree.
