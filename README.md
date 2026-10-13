@@ -104,7 +104,7 @@ Built on [LazyVim](https://www.lazyvim.org/). Below is the stuff on top.
 - Conform with a `from_node_modules` resolver — prefers the project's local `eslint_d` / `prisma` / `jsonsort` over globals, falls back cleanly
 
 #### 🔧 Git
-- AI commit messages via the Codex CLI (`<leader>gm` in `gitcommit` buffers)
+- AI commit messages via the Codex CLI: auto-filled on `git commit` when the message is empty, `<leader>gm` regenerates
 - Diffview, mini-diff, Octo (PR/issue review)
 
 #### 🔐 Secrets
@@ -123,7 +123,7 @@ Built on [LazyVim](https://www.lazyvim.org/). Below is the stuff on top.
 | `<leader>oo` / `<leader>od` | n | Oil browser / floating preview |
 | `<leader>gdm` / `<leader>gds` / `<leader>gdu` | n | Diffview: branch vs `origin/main` / uncommitted / commits ahead of upstream |
 | `<leader>um` | n | Toggle render-markdown |
-| `<leader>gm` | n | In a commit buffer: generate a Conventional Commit message for the staged diff via `codex exec` (`vim.g.ai_commit_model`, default `gpt-6-luna`) |
+| `<leader>gm` | n | In a commit buffer: regenerate the commit message (auto-generated on `git commit` via `codex exec`) (`vim.g.ai_commit_model`, default `gpt-6-luna`) |
 | `<leader>aa` / `as` | n | Sidekick: toggle CLI / select CLI |
 | `<leader>at` / `av` | n / x | Send current node / selection to Sidekick |
 | `<leader>ap` | n / x | Sidekick prompt picker |

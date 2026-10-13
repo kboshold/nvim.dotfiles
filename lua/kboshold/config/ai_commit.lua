@@ -10,32 +10,45 @@ local PROMPT = table.concat({
   "Output only the commit message, no code fences, no explanations.",
 }, " ")
 
-local function insert_message(buf, message)
-  if not vim.api.nvim_buf_is_valid(buf) then
-    return
-  end
-  local lines = vim.split(vim.trim(message), "\n", { plain = true })
-  -- replace the empty lines above git's comment block
-  local first_comment = 0
+-- number of lines above git's comment block
+local function message_end(buf)
+  local count = 0
   for i, line in ipairs(vim.api.nvim_buf_get_lines(buf, 0, -1, false)) do
     if line:match("^#") then
       break
     end
-    if vim.trim(line) ~= "" then
-      vim.notify("Commit message not empty, skipping", vim.log.levels.WARN)
-      return
-    end
-    first_comment = i
+    count = i
   end
-  table.insert(lines, "")
-  vim.api.nvim_buf_set_lines(buf, 0, first_comment, false, lines)
+  return count
 end
 
-function M.generate(buf)
-  buf = buf or vim.api.nvim_get_current_buf()
+local function has_message(buf)
+  local lines = vim.api.nvim_buf_get_lines(buf, 0, message_end(buf), false)
+  return vim.iter(lines):any(function(line)
+    return vim.trim(line) ~= ""
+  end)
+end
+
+local function insert_message(buf, message, force)
+  if not vim.api.nvim_buf_is_valid(buf) then
+    return
+  end
+  if not force and has_message(buf) then
+    return
+  end
+  local lines = vim.split(vim.trim(message), "\n", { plain = true })
+  table.insert(lines, "")
+  vim.api.nvim_buf_set_lines(buf, 0, message_end(buf), false, lines)
+end
+
+---@param buf integer
+---@param force boolean replace an existing message
+function M.generate(buf, force)
   local diff = vim.system({ "git", "diff", "--cached", "--no-color" }, { text = true }):wait()
   if diff.code ~= 0 or vim.trim(diff.stdout or "") == "" then
-    vim.notify("No staged changes", vim.log.levels.WARN)
+    if force then
+      vim.notify("No staged changes", vim.log.levels.WARN)
+    end
     return
   end
 
@@ -67,9 +80,17 @@ function M.generate(buf)
         vim.notify("codex failed: " .. vim.trim(result.stderr or ""), vim.log.levels.ERROR)
         return
       end
-      insert_message(buf, table.concat(lines, "\n"))
+      insert_message(buf, table.concat(lines, "\n"), force)
     end)
   end)
+end
+
+-- auto-generate for a fresh `git commit` (skips amend, merge, reword, -m)
+function M.auto(buf)
+  if vim.fs.basename(vim.api.nvim_buf_get_name(buf)) ~= "COMMIT_EDITMSG" or has_message(buf) then
+    return
+  end
+  M.generate(buf, false)
 end
 
 return M
