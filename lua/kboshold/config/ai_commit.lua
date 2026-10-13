@@ -20,56 +20,72 @@ local PROMPT = table.concat({
   "Output only the commit message, no code fences, no explanations.",
 }, " ")
 
--- number of lines above git's comment block
-local function message_end(buf)
-  local count = 0
-  for i, line in ipairs(vim.api.nvim_buf_get_lines(buf, 0, -1, false)) do
-    if line:match("^#") then
+-- git starts the editor in the repo; elsewhere use the buffer's repo
+local function repo_cwd(buf)
+  local is_commit_msg = vim.fs.basename(vim.api.nvim_buf_get_name(buf)) == "COMMIT_EDITMSG"
+  return not is_commit_msg and vim.fs.root(buf, ".git") or nil
+end
+
+local function comment_prefix(buf)
+  if not vim.b[buf].ai_commit_comment then
+    local cwd = repo_cwd(buf)
+    local prefix = "#"
+    for _, key in ipairs({ "core.commentString", "core.commentChar" }) do
+      local value =
+        vim.trim(vim.system({ "git", "config", "--get", key }, { text = true, cwd = cwd }):wait().stdout or "")
+      if value ~= "" then
+        prefix = value ~= "auto" and value or prefix
+        break
+      end
+    end
+    vim.b[buf].ai_commit_comment = prefix
+  end
+  return vim.b[buf].ai_commit_comment
+end
+
+-- lines above git's comment block
+local function message_lines(buf)
+  local prefix = comment_prefix(buf)
+  local lines = {}
+  for _, line in ipairs(vim.api.nvim_buf_get_lines(buf, 0, -1, false)) do
+    if vim.startswith(line, prefix) then
       break
     end
-    count = i
+    table.insert(lines, line)
   end
-  return count
+  return lines
 end
 
 local function has_message(buf)
-  local lines = vim.api.nvim_buf_get_lines(buf, 0, message_end(buf), false)
-  return vim.iter(lines):any(function(line)
+  return vim.iter(message_lines(buf)):any(function(line)
     return vim.trim(line) ~= ""
   end)
-end
-
-local function insert_message(buf, message, force)
-  if not vim.api.nvim_buf_is_valid(buf) then
-    return
-  end
-  if not force and has_message(buf) then
-    return
-  end
-  local lines = vim.split(vim.trim(message), "\n", { plain = true })
-  table.insert(lines, "")
-  vim.api.nvim_buf_set_lines(buf, 0, message_end(buf), false, lines)
 end
 
 ---@param buf integer
 ---@param force boolean replace an existing message
 function M.generate(buf, force)
+  if not force and has_message(buf) then
+    return
+  end
   if vim.fn.executable("codex") == 0 then
     if force then
       vim.notify("codex not found", vim.log.levels.WARN)
     end
     return
   end
-  -- git starts the editor in the repo; elsewhere use the buffer's repo
-  local is_commit_msg = vim.fs.basename(vim.api.nvim_buf_get_name(buf)) == "COMMIT_EDITMSG"
-  local cwd = not is_commit_msg and vim.fs.root(buf, ".git") or nil
-  local diff = vim.system(DIFF_CMD, { text = true, cwd = cwd }):wait()
+  local diff = vim.system(DIFF_CMD, { text = true, cwd = repo_cwd(buf) }):wait()
   if diff.code ~= 0 or vim.trim(diff.stdout or "") == "" then
     if force then
       vim.notify("No staged changes (lockfiles ignored)", vim.log.levels.WARN)
     end
     return
   end
+
+  -- apply only if this is the latest request and the message is untouched
+  local request = (vim.b[buf].ai_commit_request or 0) + 1
+  vim.b[buf].ai_commit_request = request
+  local original = message_lines(buf)
 
   local out_file = vim.fn.tempname()
   local model = vim.g.ai_commit_model or "gpt-6-luna"
@@ -99,14 +115,23 @@ function M.generate(buf, force)
         vim.notify("codex failed: " .. vim.trim(result.stderr or ""), vim.log.levels.ERROR)
         return
       end
-      insert_message(buf, table.concat(lines, "\n"), force)
+      if
+        not vim.api.nvim_buf_is_valid(buf)
+        or vim.b[buf].ai_commit_request ~= request
+        or not vim.deep_equal(message_lines(buf), original)
+      then
+        return
+      end
+      local message = vim.split(vim.trim(table.concat(lines, "\n")), "\n", { plain = true })
+      table.insert(message, "")
+      vim.api.nvim_buf_set_lines(buf, 0, #original, false, message)
     end)
   end)
 end
 
 -- auto-generate for a fresh `git commit` (skips amend, merge, reword, -m)
 function M.auto(buf)
-  if vim.fs.basename(vim.api.nvim_buf_get_name(buf)) ~= "COMMIT_EDITMSG" or has_message(buf) then
+  if vim.fs.basename(vim.api.nvim_buf_get_name(buf)) ~= "COMMIT_EDITMSG" then
     return
   end
   M.generate(buf, false)
