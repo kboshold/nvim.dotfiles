@@ -57,3 +57,13 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.conceallevel = 0
   end,
 })
+
+vim.api.nvim_create_autocmd("FileType", {
+  group = group,
+  pattern = "gitcommit",
+  callback = function(ev)
+    vim.keymap.set("n", "<leader>gm", function()
+      require("kboshold.config.ai_commit").generate(ev.buf)
+    end, { buffer = ev.buf, desc = "Generate Commit Message (codex)" })
+  end,
+})
