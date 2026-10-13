@@ -84,7 +84,7 @@ Built on [LazyVim](https://www.lazyvim.org/). Below is the stuff on top.
 - Catppuccin Mocha with a 9-color indent cycle (custom `Indent*` / `IndentScope*` highlights)
 - Snacks dashboard with custom ASCII branding
 - Lualine with a mode-colored `CursorLineNr` (sampled from the current mode's lualine highlight)
-- Rainbow delimiters, render-markdown, virt-column
+- Rainbow delimiters, render-markdown, thin colorcolumn rulers (`config/ruler.lua`)
 
 #### 🤖 AI
 - [Sidekick](https://github.com/folke/sidekick.nvim) (LazyVim `ai.sidekick` extra): AI CLI integration (Claude, etc.), NES disabled
