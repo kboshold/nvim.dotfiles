@@ -2,6 +2,16 @@
 local M = {}
 
 local MAX_DIFF_CHARS = 60000
+local DIFF_CMD = {
+  "git",
+  "diff",
+  "--cached",
+  "--no-color",
+  "--",
+  ":/",
+  ":(exclude,glob,top)**/*.lock",
+  ":(exclude,glob,top)**/*-lock.*",
+}
 
 local PROMPT = table.concat({
   "Write a git commit message for the staged diff in <stdin>.",
@@ -44,10 +54,19 @@ end
 ---@param buf integer
 ---@param force boolean replace an existing message
 function M.generate(buf, force)
-  local diff = vim.system({ "git", "diff", "--cached", "--no-color" }, { text = true }):wait()
+  if vim.fn.executable("codex") == 0 then
+    if force then
+      vim.notify("codex not found", vim.log.levels.WARN)
+    end
+    return
+  end
+  -- git starts the editor in the repo; elsewhere use the buffer's repo
+  local is_commit_msg = vim.fs.basename(vim.api.nvim_buf_get_name(buf)) == "COMMIT_EDITMSG"
+  local cwd = not is_commit_msg and vim.fs.root(buf, ".git") or nil
+  local diff = vim.system(DIFF_CMD, { text = true, cwd = cwd }):wait()
   if diff.code ~= 0 or vim.trim(diff.stdout or "") == "" then
     if force then
-      vim.notify("No staged changes", vim.log.levels.WARN)
+      vim.notify("No staged changes (lockfiles ignored)", vim.log.levels.WARN)
     end
     return
   end
