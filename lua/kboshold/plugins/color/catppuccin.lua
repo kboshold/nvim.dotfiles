@@ -31,8 +31,8 @@ return {
         SnacksDashboardAuthor = { fg = util.color.interpolate(colors.base, colors.lavender, 0.75) },
 
         CursorLine = { bg = util.color.interpolate(colors.base, colors.lavender, 0.96) },
-        ColorColumnBlue = { fg = util.color.interpolate(colors.base, colors.blue, 0.85) },
-        ColorColumnRed = { fg = util.color.interpolate(colors.base, colors.red, 0.85) },
+        ColorColumnBlue = { fg = util.color.interpolate(colors.base, colors.blue, 0.98) },
+        ColorColumnRed = { fg = util.color.interpolate(colors.base, colors.red, 0.98) },
 
         SnacksPickerBorder = { fg = colors.lavender, bg = colors.mantle },
         SnacksPickerTree = { fg = colors.surface0 },
