@@ -1,8 +1,8 @@
 -- Headless health report: notify errors, :messages, LSP clients, checkhealth problems.
 local root = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p:h")
-local out = {}
 local function emit(line)
-  table.insert(out, line)
+  io.stdout:write(line .. "\n")
+  io.stdout:flush()
 end
 
 local notified = {}
@@ -72,5 +72,4 @@ for _, line in ipairs(problems) do
   emit("  " .. vim.trim(line):sub(1, 200))
 end
 
-io.stdout:write(table.concat(out, "\n") .. "\n")
 vim.cmd("qa!")

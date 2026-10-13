@@ -19,4 +19,4 @@ sort -n "$tmp/times" | awk '{a[NR]=$1} END {printf "startup (headless, %d runs):
 nvim --headless sample.ts --startuptime "$tmp/file" +qa >/dev/null 2>&1
 printf 'startup with sample.ts: %sms\n' "$(grep "NVIM STARTED" "$tmp/file" | tail -1 | awk '{print $1}')"
 
-nvim --headless -c "luafile $dir/check.lua" 2>/dev/null
+timeout -s KILL 180 nvim --headless -c "luafile $dir/check.lua" 2>/dev/null || echo "check.lua failed or timed out"
