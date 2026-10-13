@@ -87,8 +87,7 @@ Built on [LazyVim](https://www.lazyvim.org/). Below is the stuff on top.
 - Rainbow delimiters, render-markdown, virt-column
 
 #### 🤖 AI
-- Copilot (loads on `InsertEnter`) + CopilotChat
-- [Sidekick](https://github.com/folke/sidekick.nvim) — multi-CLI AI orchestration (Claude, etc.)
+- [Sidekick](https://github.com/folke/sidekick.nvim) (LazyVim `ai.sidekick` extra): AI CLI integration (Claude, etc.), NES disabled
 
 #### 🔍 Navigation
 - Snacks picker + explorer (auto-opens on `nvim` with no args or a directory; skipped for piped input)
@@ -96,16 +95,15 @@ Built on [LazyVim](https://www.lazyvim.org/). Below is the stuff on top.
 - [vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator) (`<C-h/j/k/l>`)
 
 #### 🧠 Language / LSP
-- Vue/TypeScript hybrid mode (volar + vtsls with `@vue/typescript-plugin`)
+- Vue/TypeScript via the LazyVim `lang.vue` extra (vue_ls + vtsls with `@vue/typescript-plugin`)
 - Prisma, Nix (alejandra), Python, Ansible, Docker, Helm, JSON, Markdown, SQL, Tailwind, YAML (via LazyVim extras)
 - lazydev for Lua + Neovim API awareness
 
 #### ✍️ Completion & formatting
-- [blink.cmp](https://github.com/saghen/blink.cmp) with `ai_cmp` integration
+- [blink.cmp](https://github.com/saghen/blink.cmp)
 - Conform with a `from_node_modules` resolver — prefers the project's local `eslint_d` / `prisma` / `jsonsort` over globals, falls back cleanly
 
 #### 🔧 Git
-- [smart-commit.nvim](https://github.com/kboshold/smart-commit.nvim) — pre-commit checks + Copilot-generated messages
 - Diffview, mini-diff, Octo (PR/issue review)
 
 #### 🔐 Secrets
@@ -114,7 +112,7 @@ Built on [LazyVim](https://www.lazyvim.org/). Below is the stuff on top.
 ### ⌨️ Keymaps
 
 > [!TIP]
-> The full list is discoverable via [which-key](https://github.com/folke/which-key.nvim) (just press `<leader>` and wait) or `:Telescope keymaps`. The table below only lists the custom bindings on top of LazyVim defaults.
+> The full list is discoverable via [which-key](https://github.com/folke/which-key.nvim) (just press `<leader>` and wait) or `<leader>sk`. The table below only lists the custom bindings on top of LazyVim defaults.
 
 | Mapping | Mode | Description |
 | ------- | ---- | ----------- |
@@ -122,15 +120,13 @@ Built on [LazyVim](https://www.lazyvim.org/). Below is the stuff on top.
 | `gf` | n | Open file under cursor; supports `:line` and `:line-line` suffix |
 | `<leader>e` | n | Toggle snacks explorer (reuses open pane) |
 | `<leader>oo` / `<leader>od` | n | Oil browser / floating preview |
-| `<leader>sc` | n | Toggle smart-commit status window |
-| `<leader>gdm` / `<leader>gds` | n | Diffview: branch vs `origin/main` / uncommitted |
+| `<leader>gdm` / `<leader>gds` / `<leader>gdu` | n | Diffview: branch vs `origin/main` / uncommitted / commits ahead of upstream |
 | `<leader>um` | n | Toggle render-markdown |
 | `<leader>aa` / `as` | n | Sidekick: toggle CLI / select CLI |
 | `<leader>at` / `av` | n / x | Send current node / selection to Sidekick |
 | `<leader>ap` | n / x | Sidekick prompt picker |
 | `<leader>ac` | n | Toggle Sidekick Claude |
 | `<C-.>` | any | Switch focus to Sidekick |
-| `<Tab>` | i | Apply next-edit suggestion; falls back to `<Tab>` |
 | `<C-h/j/k/l>` / `<C-\>` | n | Tmux-aware pane navigation |
 
 ### 🧰 Custom commands
@@ -142,3 +138,9 @@ Built on [LazyVim](https://www.lazyvim.org/). Below is the stuff on top.
 | `:PathCopyRelativeFull` | Relative path + current (or visual) line range |
 | `:PathCopyAbsolute` | Copy absolute path |
 | `:PathCopyAbsoluteFull` | Absolute path + line range |
+
+### 🩺 Health check
+
+`scripts/check.sh` runs Neovim headless and reports startup time, LSP clients per sample file, notify errors and `:checkhealth` problems. It uses `NVIM_APPNAME=nvim-opt` by default (symlink `~/.config/nvim-opt` to this repo); `scripts/install.lua` installs mason tools and parsers in that isolated instance.
+
+Use `:InspectTree` (built in) to inspect the treesitter tree.
