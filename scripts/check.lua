@@ -18,7 +18,7 @@ vim.api.nvim_exec_autocmds("User", { pattern = "VeryLazy", modeline = false })
 local stats = require("lazy").stats()
 emit(("plugins: %d loaded / %d total (after VeryLazy)"):format(stats.loaded, stats.count))
 
-local files = { "sample.ts", "sample.vue", "sample.lua", "sample.md", "sample.nix" }
+local files = { "sample.ts", "sample.vue", "sample.lua", "sample.md", "sample.nix", "tailwind/sample.vue" }
 for _, file in ipairs(files) do
   local ok, err = pcall(vim.cmd.edit, vim.fs.joinpath(root, "fixtures", file))
   if not ok then
@@ -34,7 +34,7 @@ for _, file in ipairs(files) do
   end, vim.lsp.get_clients({ bufnr = buf }))
   table.sort(names)
   local ts = pcall(vim.treesitter.get_parser, buf) and "ts" or "no-ts"
-  emit(("%-11s %-5s lsp: %s"):format(file, ts, table.concat(names, ", ")))
+  emit(("%-20s %-5s lsp: %s"):format(file, ts, table.concat(names, ", ")))
 end
 
 for _, client in ipairs(vim.lsp.get_clients()) do
