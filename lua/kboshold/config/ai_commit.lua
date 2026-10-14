@@ -43,23 +43,30 @@ local function comment_prefix(buf)
   return vim.b[buf].ai_commit_comment
 end
 
--- lines above git's comment block
-local function message_lines(buf)
+-- number of lines above git's comment block
+local function message_end(buf)
   local prefix = comment_prefix(buf)
-  local lines = {}
-  for _, line in ipairs(vim.api.nvim_buf_get_lines(buf, 0, -1, false)) do
+  for i, line in ipairs(vim.api.nvim_buf_get_lines(buf, 0, -1, false)) do
     if vim.startswith(line, prefix) then
-      break
+      return i - 1
     end
-    table.insert(lines, line)
   end
-  return lines
+  return vim.api.nvim_buf_line_count(buf)
 end
 
+-- any non-comment text before git's scissors line
 local function has_message(buf)
-  return vim.iter(message_lines(buf)):any(function(line)
-    return vim.trim(line) ~= ""
-  end)
+  local prefix = comment_prefix(buf)
+  local scissors = prefix .. " ------------------------ >8 ------------------------"
+  for _, line in ipairs(vim.api.nvim_buf_get_lines(buf, 0, -1, false)) do
+    if line == scissors then
+      return false
+    end
+    if not vim.startswith(line, prefix) and vim.trim(line) ~= "" then
+      return true
+    end
+  end
+  return false
 end
 
 ---@param buf integer
@@ -82,10 +89,10 @@ function M.generate(buf, force)
     return
   end
 
-  -- apply only if this is the latest request and the message is untouched
+  -- apply only if this is the latest request and the buffer is untouched
   local request = (vim.b[buf].ai_commit_request or 0) + 1
   vim.b[buf].ai_commit_request = request
-  local original = message_lines(buf)
+  local original = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
 
   local out_file = vim.fn.tempname()
   local model = vim.g.ai_commit_model or "gpt-6-luna"
@@ -118,13 +125,13 @@ function M.generate(buf, force)
       if
         not vim.api.nvim_buf_is_valid(buf)
         or vim.b[buf].ai_commit_request ~= request
-        or not vim.deep_equal(message_lines(buf), original)
+        or not vim.deep_equal(vim.api.nvim_buf_get_lines(buf, 0, -1, false), original)
       then
         return
       end
       local message = vim.split(vim.trim(table.concat(lines, "\n")), "\n", { plain = true })
       table.insert(message, "")
-      vim.api.nvim_buf_set_lines(buf, 0, #original, false, message)
+      vim.api.nvim_buf_set_lines(buf, 0, message_end(buf), false, message)
     end)
   end)
 end

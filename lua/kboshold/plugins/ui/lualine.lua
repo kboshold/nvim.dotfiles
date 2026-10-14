@@ -100,7 +100,7 @@ return {
           {
             function()
               local status = require("sidekick.status").cli()
-              return " " .. (#status > 1 and #status or "")
+              return " " .. (#status > 1 and #status or "")
             end,
             cond = function()
               return package.loaded["sidekick"] ~= nil and #require("sidekick.status").cli() > 0
