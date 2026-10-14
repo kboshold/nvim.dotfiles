@@ -28,12 +28,7 @@ return {
     {
       "<leader>od",
       function()
-        local oil = require("oil")
-        oil.toggle_float()
-        -- using OilEnter does not work quite well
-        vim.defer_fn(function()
-          oil.open_preview()
-        end, 50)
+        require("oil").toggle_float(nil, { preview = {} })
       end,
       desc = "Oil Preview",
     },

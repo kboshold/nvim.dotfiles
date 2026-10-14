@@ -43,32 +43,24 @@ return {
     },
   },
   init = function()
-    -- automatically open for no arguments (current directory) and when a directory will be opend
-    local first_buf_enter = 1
-    local function on_buf_enter(data)
-      if first_buf_enter == 0 then
-        return
-      end
-      first_buf_enter = 0
-
-      local is_directory = vim.fn.isdirectory(data.file) == 1
-      local no_name = data.file == "" and vim.bo[data.buf].buftype == ""
-      local is_stream = vim.g.ux_piped_input == 1
-
-      if is_stream then
-        return
-      end
-
-      if not (is_directory or no_name) then
-        return
-      end
-
-      Snacks.explorer({ focus = false })
+    -- only auto-open on wide terminals
+    if vim.o.columns <= 158 then
+      return
     end
-
-    -- only  open neotree if size is > 158
-    if vim.o.columns > 158 then
-      vim.api.nvim_create_autocmd({ "BufEnter" }, { callback = on_buf_enter })
-    end
+    -- open for no arguments (current directory) or when a directory is opened
+    vim.api.nvim_create_autocmd("BufEnter", {
+      group = vim.api.nvim_create_augroup("kboshold_explorer", { clear = true }),
+      once = true,
+      callback = function(data)
+        if vim.g.ux_piped_input == 1 then
+          return
+        end
+        local is_directory = vim.fn.isdirectory(data.file) == 1
+        local no_name = data.file == "" and vim.bo[data.buf].buftype == ""
+        if is_directory or no_name then
+          Snacks.explorer({ focus = false })
+        end
+      end,
+    })
   end,
 }

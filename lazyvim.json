@@ -1,9 +1,10 @@
 {
 	"extras": [
-		"lazyvim.plugins.extras.coding.mini-surround",
-		"lazyvim.plugins.extras.coding.yanky",
+		"lazyvim.plugins.extras.ai.sidekick",
 		"lazyvim.plugins.extras.coding.blink",
 		"lazyvim.plugins.extras.coding.luasnip",
+		"lazyvim.plugins.extras.coding.mini-surround",
+		"lazyvim.plugins.extras.coding.yanky",
 		"lazyvim.plugins.extras.editor.aerial",
 		"lazyvim.plugins.extras.editor.dial",
 		"lazyvim.plugins.extras.editor.inc-rename",
@@ -17,15 +18,18 @@
 		"lazyvim.plugins.extras.lang.json",
 		"lazyvim.plugins.extras.lang.markdown",
 		"lazyvim.plugins.extras.lang.nix",
+		"lazyvim.plugins.extras.lang.prisma",
 		"lazyvim.plugins.extras.lang.python",
+		"lazyvim.plugins.extras.lang.sql",
 		"lazyvim.plugins.extras.lang.tailwind",
 		"lazyvim.plugins.extras.lang.typescript",
-		"lazyvim.plugins.extras.lang.sql",
+		"lazyvim.plugins.extras.lang.vue",
 		"lazyvim.plugins.extras.lang.yaml",
+		"lazyvim.plugins.extras.ui.indent-blankline",
 		"lazyvim.plugins.extras.ui.treesitter-context",
 		"lazyvim.plugins.extras.util.dot",
-		"lazyvim.plugins.extras.util.octo",
-		"lazyvim.plugins.extras.util.mini-hipatterns"
+		"lazyvim.plugins.extras.util.mini-hipatterns",
+		"lazyvim.plugins.extras.util.octo"
 	],
 	"version": 8
 }

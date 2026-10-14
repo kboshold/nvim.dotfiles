@@ -8,31 +8,36 @@ vim.api.nvim_create_autocmd("StdinReadPost", {
   end,
 })
 
--- Change the color of CursorLineNr depending on the mode
-local last_mode_suffix = nil
-local function update_cursor_line_nr()
-  local ok, hl = pcall(require, "lualine.highlight")
+-- Change the color of CursorLineNr depending on the mode (same colors as catppuccin's lualine theme)
+local MODE_COLORS = {
+  n = "blue",
+  i = "green",
+  t = "green",
+  c = "peach",
+  v = "mauve",
+  V = "mauve",
+  ["\22"] = "mauve",
+  s = "mauve",
+  S = "mauve",
+  ["\19"] = "mauve",
+  R = "red",
+}
+
+local last_color = nil
+local function update_cursor_line_nr(force)
+  local ok, palettes = pcall(require, "catppuccin.palettes")
   if not ok then
     return
   end
-  local suffix = hl.get_mode_suffix()
-  if suffix == last_mode_suffix then
+  local color = MODE_COLORS[vim.fn.mode():sub(1, 1)] or "blue"
+  if color == last_color and not force then
     return
   end
-  last_mode_suffix = suffix
+  last_color = color
 
-  local cursor_line_hl = vim.api.nvim_get_hl(0, {
-    name = "CursorLine",
-    create = false,
-  })
-
-  local lualine_hl = vim.api.nvim_get_hl(0, {
-    name = "lualine_a" .. suffix,
-    create = false,
-  })
-
+  local cursor_line_hl = vim.api.nvim_get_hl(0, { name = "CursorLine", create = false })
   vim.api.nvim_set_hl(0, "CursorLineNr", {
-    fg = lualine_hl.bg,
+    fg = palettes.get_palette()[color],
     bg = cursor_line_hl.bg,
     bold = true,
   })
@@ -40,13 +45,14 @@ end
 
 vim.api.nvim_create_autocmd("ModeChanged", {
   group = group,
-  callback = update_cursor_line_nr,
+  callback = function()
+    update_cursor_line_nr(false)
+  end,
 })
-vim.api.nvim_create_autocmd("BufEnter", {
+vim.api.nvim_create_autocmd({ "BufEnter", "ColorScheme" }, {
   group = group,
   callback = function()
-    last_mode_suffix = nil
-    update_cursor_line_nr()
+    update_cursor_line_nr(true)
   end,
 })
 
@@ -55,5 +61,17 @@ vim.api.nvim_create_autocmd("FileType", {
   pattern = "markdown",
   callback = function()
     vim.opt_local.conceallevel = 0
+  end,
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+  group = group,
+  pattern = "gitcommit",
+  callback = function(ev)
+    local ai_commit = require("kboshold.config.ai_commit")
+    ai_commit.auto(ev.buf)
+    vim.keymap.set("n", "<leader>gm", function()
+      ai_commit.generate(ev.buf, true)
+    end, { buffer = ev.buf, desc = "Regenerate Commit Message (codex)" })
   end,
 })

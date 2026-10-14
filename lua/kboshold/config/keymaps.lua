@@ -1,13 +1,17 @@
 local function set_marks_for_current_highlight()
-  local ts_utils = require("nvim-treesitter.ts_utils")
-  local current_node = ts_utils.get_node_at_cursor()
-  if current_node == nil then
+  local node = vim.treesitter.get_node()
+  if node == nil then
     return false
   end
 
-  local start_row, start_col, end_row, end_col = current_node:range()
+  local start_row, start_col, end_row, end_col = node:range()
+  -- end is exclusive; a node ending at column 0 ends on the previous line
+  if end_col == 0 and end_row > start_row then
+    end_row = end_row - 1
+    end_col = #vim.api.nvim_buf_get_lines(0, end_row, end_row + 1, false)[1] + 1
+  end
   vim.api.nvim_buf_set_mark(0, "<", start_row + 1, start_col, {})
-  vim.api.nvim_buf_set_mark(0, ">", end_row + 1, end_col - 1, {})
+  vim.api.nvim_buf_set_mark(0, ">", end_row + 1, math.max(end_col - 1, 0), {})
   return true
 end
 

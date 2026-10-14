@@ -5,16 +5,6 @@ return {
     "nvim-tree/nvim-web-devicons",
     "catppuccin",
   },
-  init = function()
-    vim.g.lualine_laststatus = vim.o.laststatus
-    if vim.fn.argc(-1) > 0 then
-      -- set an empty statusline till lualine loads
-      vim.o.statusline = " "
-    else
-      -- hide the statusline on the starter page
-      vim.o.laststatus = 0
-    end
-  end,
   opts = function()
     local empty = require("lualine.component"):extend()
     function empty:draw(default_highlight)
@@ -25,18 +15,18 @@ return {
       return self.status
     end
 
-    local mocha = require("catppuccin.palettes").get_palette("mocha")
+    local colors = require("catppuccin.palettes").get_palette()
 
     local left_seperator = {
       empty,
       separator = { right = "" },
-      color = { bg = mocha.mantle },
+      color = { bg = colors.mantle },
     }
 
     local right_seperator = {
       empty,
       separator = { left = "" },
-      color = { bg = mocha.mantle },
+      color = { bg = colors.mantle },
     }
 
     return {
@@ -62,7 +52,7 @@ return {
               return "󰑋  @" .. reg
             end,
             separator = { right = "" },
-            color = { fg = mocha.base, bg = mocha.red },
+            color = { fg = colors.base, bg = colors.red },
           },
           left_seperator,
           {
@@ -103,17 +93,27 @@ return {
 
             -- Color the symbol icons.
             colored = true,
-            color = { fg = mocha.overlay1 },
+            color = { fg = colors.overlay1 },
           },
         },
         lualine_x = {
           {
+            function()
+              local status = require("sidekick.status").cli()
+              return " " .. (#status > 1 and #status or "")
+            end,
+            cond = function()
+              return package.loaded["sidekick"] ~= nil and #require("sidekick.status").cli() > 0
+            end,
+            color = { fg = colors.mauve },
+          },
+          {
             "filesize",
-            color = { fg = mocha.overlay1 },
+            color = { fg = colors.overlay1 },
           },
           {
             "encoding",
-            color = { fg = mocha.overlay1 },
+            color = { fg = colors.overlay1 },
           },
           {
             "fileformat",
@@ -122,7 +122,7 @@ return {
               dos = "CRLF", -- e70f
               mac = "CR", -- e711
             },
-            color = { fg = mocha.overlay1 },
+            color = { fg = colors.overlay1 },
           },
         },
         lualine_y = {
@@ -148,7 +148,7 @@ return {
               }
               return icons[math.min(#clients, 6)] or ""
             end,
-            color = { fg = mocha.blue },
+            color = { fg = colors.blue },
             padding = { left = 0, right = 1 },
           },
           right_seperator,
@@ -158,7 +158,7 @@ return {
           {
             "searchcount",
             separator = { left = "" },
-            color = { bg = mocha.sky },
+            color = { bg = colors.sky },
           },
           right_seperator,
           {

@@ -14,7 +14,6 @@ require("lazy").setup({
     -- import/override with your plugins
     { import = "kboshold.plugins.ai" },
     { import = "kboshold.plugins.color" },
-    { import = "kboshold.plugins.code" },
     { import = "kboshold.plugins.editor" },
     { import = "kboshold.plugins.ui" },
     { import = "kboshold.plugins.lsp" },
